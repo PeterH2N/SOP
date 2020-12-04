@@ -1,4 +1,4 @@
-#version 130 core
+#version 130
 
 #define MAX_STEPS 100
 #define MAX_DIST 100.
@@ -58,7 +58,7 @@ float sphereSDF(vec3 p, vec4 sphere)
         return length(p - sphere.xyz) - sphere.w;
 }
 
-distCol sceneSDF(vec3 p)
+distCol sceneSDFCol(vec3 p)
 {
     distCol min = distCol(MAX_DIST, vec3(0));
     // spheres
@@ -92,16 +92,28 @@ distCol sceneSDF(vec3 p)
     return min;
 }
 
-float GetDist(vec3 p)
+float sceneSDF(vec3 p)
 {
-    //vec4 sphere = vec4(0, 1, 6, 1);
-    float sceneDist = sceneSDF(p).dist;
-    float planeDist = p.y;
-    float d = min(sceneDist, planeDist);
-    return d;
+    float minD = MAX_DIST;
+    for (int i = 0; i < numSpheres; i++)
+    {
+        minD = min(minD, sphereSDF(p, sphere[i]));
+    }
+    // capsules
+    for (int i = 0; i < numCaps; i++)
+    {
+        minD = min(minD, capsuleSDF(p, capsuleA[i], capsuleB[i], capsuleR[i]));
+    }
+    // planes
+    for (int i = 0; i < numPlanes; i++)
+    {
+        minD = min(minD, planeSDF(p, planeP[i], planeN[i]));
+    }
+
+    return minD;
 }
 
-distCol RayMarch(vec3 ro, vec3 rd)
+distCol RayMarchCol(vec3 ro, vec3 rd)
 {
     float dO = 0.;
     vec3 col;
@@ -109,7 +121,7 @@ distCol RayMarch(vec3 ro, vec3 rd)
     for (int i = 0; i < MAX_STEPS; i++)
     {
         vec3 p = ro + dO * rd;
-        distCol dS = sceneSDF(p);
+        distCol dS = sceneSDFCol(p);
         dO += dS.dist;
         if (dS.dist < SURF_DIST || dO > MAX_DIST)
         {
@@ -120,15 +132,29 @@ distCol RayMarch(vec3 ro, vec3 rd)
     return distCol(dO, col);
 }
 
+float RayMarch(vec3 ro, vec3 rd)
+{
+    float dO = 0.;
+
+    for (int i = 0; i < MAX_STEPS; i++)
+    {
+        vec3 p = ro + dO * rd;
+        float dS = sceneSDF(p);
+        dO += dS;
+        if (dS < SURF_DIST || dO > MAX_DIST) break;
+    }
+    return dO;
+}
+
 vec3 GetNormal(vec3 p)
 {
-    float d = GetDist(p);
+    float d = sceneSDF(p);
     vec2 e = vec2(.01, 0);
 
     vec3 n = d - vec3(
-        GetDist(p - e.xyy),
-        GetDist(p - e.yxy),
-        GetDist(p - e.yyx));
+        sceneSDF(p - e.xyy),
+        sceneSDF(p - e.yxy),
+        sceneSDF(p - e.yyx));
     
     return normalize(n);
 
@@ -146,7 +172,7 @@ float GetLight(vec3 p)
 
     if (shadow)
     {
-        float d = RayMarch(p + n * SURF_DIST * 2, l).dist;
+        float d = RayMarch(p + n * SURF_DIST * 2, l);
         if (d < length(lightPos - p)) dif *= .1;
     }
 
@@ -161,7 +187,7 @@ void main()
     vec3 ro = vec3(0, 4, 0);
     vec3 rd = normalize(vec3(uv.x, uv.y, 1)); 
 
-    distCol dc = RayMarch(ro, rd);
+    distCol dc = RayMarchCol(ro, rd);
 
     float d = dc.dist;
 

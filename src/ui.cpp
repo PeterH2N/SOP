@@ -9,7 +9,7 @@ RMUI::RMUI(sf::Shader* _shader)
 void RMUI::draw()
 {
     ImGui::Begin("Options");
-    if (ImGui::Checkbox("Shadow", &shadow))
+    if (ImGui::Checkbox("Shadows", &shadow))
         shader->setUniform("shadow", shadow);
     ImGui::End();
 }
