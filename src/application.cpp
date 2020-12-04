@@ -1,15 +1,10 @@
-#include "imgui.h"
-#include "imgui-SFML.h"
+#include "ui.hpp"
+#include "rmscene.hpp"
 
-#include <SFML/Graphics.hpp>
-#include <SFML/System.hpp>
-
-#include <SFML/OpenGL.hpp>
 
 int main()
 {
-
-    sf::RenderWindow window(sf::VideoMode(960, 450), "ImGui + SFML = <3");
+    sf::RenderWindow window(sf::VideoMode(960, 620), "ImGui + SFML = <3");
 
     window.setFramerateLimit(60);
     ImGui::SFML::Init(window);
@@ -17,24 +12,30 @@ int main()
     sf::Event event;
 
     sf::Vector2f windowSize = { (float)window.getSize().x, (float)window.getSize().y };
-
-    float aspectRatio = (float)window.getSize().x / (float)window.getSize().y;
+    sf::Vector2f viewPort = sf::Vector2f(windowSize.x, windowSize.y);
 
     sf::Shader shader;
 
-    shader.loadFromFile("res/shader/basic_shader.vert", "res/shader/basic_shader.frag");
+    shader.loadFromFile("res/shader/basic_shader.vert", "res/shader/raymarching_shader.frag");
 
     sf::Vertex screen[] = {
-    sf::Vertex({-1.0f, -1.0f}, sf::Color::Red),
-    sf::Vertex({ 1.0f, -1.0f}, sf::Color::Red),
-    sf::Vertex({ 1.0f,  1.0f}, sf::Color::Red),
-    sf::Vertex({-1.0f,  1.0f}, sf::Color::Red),
+    sf::Vertex({0, 0}),
+    sf::Vertex({ viewPort.x, 0}),
+    sf::Vertex({ viewPort.x,  viewPort.y}),
+    sf::Vertex({0,  viewPort.y}),
     };
 
-    
-
-    shader.setUniform("screenSize", windowSize);
+    shader.setUniform("screenSize", viewPort);
     shader.setUniform("time", 0.0f);
+
+    RMscene scene;
+
+    scene.addSphere({vec4(1, 1, 10, 1.5), sf::Color::White});
+    scene.addSphere({ vec4(-1, 1, 10, 1.5), sf::Color::White });
+    scene.addCapsule({ vec3(0, 0, 10), vec3(0, 7, 10), 1 , sf::Color::Black});
+    scene.sendToShader(&shader);
+
+    RMUI ui(&shader);
 
     sf::Clock deltaClock;
     sf::Clock time;
@@ -48,7 +49,6 @@ int main()
             {
                 // adjust the viewport when the window is resized
                 windowSize = { (float)event.size.width, (float)event.size.height };
-                aspectRatio = (float)windowSize.x / (float)windowSize.y;
             }
 
             ImGui::SFML::ProcessEvent(event);
@@ -58,9 +58,7 @@ int main()
 
         ImGui::SFML::Update(window, deltaClock.restart());
 
-        ImGui::Begin("imgui");
-        ImGui::Button("look");
-        ImGui::End();
+        ui.draw();
 
         window.clear();
 
