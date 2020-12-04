@@ -49,12 +49,16 @@ public:
 
 	void addSphere(RMscene::sphere);
 	void addCapsule(RMscene::capsule);
+	void addPlane(RMscene::plane);
 
 	void changeSphere(UINT, RMscene::sphere);
 	void changeCapsule(UINT, RMscene::capsule);
+	void changePlane(UINT, RMscene::plane);
 
 	void removeSphere(UINT);
 	void removeCapsule(UINT);
+	void removePlane(UINT);
+
 };
 
 #endif SCENE_H

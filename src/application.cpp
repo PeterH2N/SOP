@@ -4,7 +4,7 @@
 
 int main()
 {
-    sf::RenderWindow window(sf::VideoMode(960, 620), "ImGui + SFML = <3");
+    sf::RenderWindow window(sf::VideoMode(620, 480), "ImGui + SFML = <3");
 
     window.setFramerateLimit(60);
     ImGui::SFML::Init(window);
@@ -31,8 +31,9 @@ int main()
     RMscene scene;
 
     scene.addSphere({vec4(1, 1, 10, 1.5), sf::Color::White});
-    scene.addSphere({ vec4(-1, 1, 10, 1.5), sf::Color::White });
-    scene.addCapsule({ vec3(0, 0, 10), vec3(0, 7, 10), 1 , sf::Color::Black});
+    scene.addSphere({ vec4(-1, 1, 10, 1.5), sf::Color::Yellow });
+    scene.addCapsule({ vec3(-3, 2, 10), vec3(3, 2, 10), 1 , sf::Color::Red});
+    scene.addPlane({ vec3(0,0,0), vec3(0,1,0) , sf::Color::White});
     scene.sendToShader(&shader);
 
     RMUI ui(&shader);

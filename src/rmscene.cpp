@@ -97,22 +97,43 @@ void RMscene::addCapsule(RMscene::capsule c)
 	capsules.push_back(c);
 }
 
+void RMscene::addPlane(RMscene::plane p)
+{
+	planes.push_back(p);
+}
+
 void RMscene::changeSphere(UINT i, RMscene::sphere s)
 {
-	spheres[i] = s;
+	if (i < spheres.size())
+		spheres[i] = s;
 }
 
 void RMscene::changeCapsule(UINT i, RMscene::capsule c)
 {
-	capsules[i] = c;
+	if (i < capsules.size())
+		capsules[i] = c;
+}
+
+void RMscene::changePlane(UINT i, RMscene::plane p)
+{
+	if (i < planes.size())
+		planes[i] = p;
 }
 
 void RMscene::removeSphere(UINT i)
 {
-	spheres.erase(spheres.begin() + i);
+	if (i < spheres.size())
+		spheres.erase(spheres.begin() + i);
 }
 
 void RMscene::removeCapsule(UINT i)
 {
-	capsules.erase(capsules.begin() + i);
+	if (i < capsules.size())
+		capsules.erase(capsules.begin() + i);
+}
+
+void RMscene::removePlane(UINT i)
+{
+	if (i < planes.size())
+		planes.erase(planes.begin() + i);
 }

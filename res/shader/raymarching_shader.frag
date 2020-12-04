@@ -101,18 +101,23 @@ float GetDist(vec3 p)
     return d;
 }
 
-float RayMarch(vec3 ro, vec3 rd)
+distCol RayMarch(vec3 ro, vec3 rd)
 {
     float dO = 0.;
+    vec3 col;
 
     for (int i = 0; i < MAX_STEPS; i++)
     {
         vec3 p = ro + dO * rd;
-        float dS = GetDist(p);
-        dO += dS;
-        if (dS < SURF_DIST || dO > MAX_DIST) break;
+        distCol dS = sceneSDF(p);
+        dO += dS.dist;
+        if (dS.dist < SURF_DIST || dO > MAX_DIST)
+        {
+            col = dS.col;
+            break;
+        }
     }
-    return dO;
+    return distCol(dO, col);
 }
 
 vec3 GetNormal(vec3 p)
@@ -141,7 +146,7 @@ float GetLight(vec3 p)
 
     if (shadow)
     {
-        float d = RayMarch(p + n * SURF_DIST * 2, l);
+        float d = RayMarch(p + n * SURF_DIST * 2, l).dist;
         if (d < length(lightPos - p)) dif *= .1;
     }
 
@@ -156,12 +161,14 @@ void main()
     vec3 ro = vec3(0, 4, 0);
     vec3 rd = normalize(vec3(uv.x, uv.y, 1)); 
 
-    float d = RayMarch(ro, rd);
+    distCol dc = RayMarch(ro, rd);
+
+    float d = dc.dist;
 
     vec3 p =  ro + rd * d;
 
     float dif = GetLight(p);
-    col = vec3(1,0,0);
+    col = dc.col;
     col *= dif;
 
     gl_FragColor = vec4(col, 1.0);
