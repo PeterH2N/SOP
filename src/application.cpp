@@ -1,10 +1,12 @@
 #include "ui.hpp"
 #include "rmscene.hpp"
+#include <iostream>
+
 
 
 int main()
 {
-    sf::RenderWindow window(sf::VideoMode(620, 480), "ImGui + SFML = <3");
+    sf::RenderWindow window(sf::VideoMode(1280, 720), "ImGui + SFML = <3");
 
     window.setFramerateLimit(60);
     ImGui::SFML::Init(window);
@@ -12,7 +14,7 @@ int main()
     sf::Event event;
 
     sf::Vector2f windowSize = { (float)window.getSize().x, (float)window.getSize().y };
-    sf::Vector2f viewPort = sf::Vector2f(windowSize.x, windowSize.y);
+    sf::Vector2f viewPort = sf::Vector2f(windowSize.x / 2, windowSize.y);
 
     sf::Shader shader;
 
@@ -30,13 +32,16 @@ int main()
 
     RMscene scene;
 
-    scene.addSphere({vec4(1, 1, 10, 1.5), sf::Color::White});
-    scene.addSphere({ vec4(-1, 1, 10, 1.5), sf::Color::Yellow });
-    scene.addCapsule({ vec3(-3, 2, 10), vec3(3, 2, 10), 1 , sf::Color::Red});
-    scene.addPlane({ vec3(0,0,0), vec3(0,1,0) , sf::Color::White});
+    //scene.addSphere({vec4(1, 1, 10, 1.5), sf::Color::White, "sphere 1"});
+    //scene.addSphere({ vec4(-1, 1, 10, 1.5), sf::Color::Yellow, "sphere 2" });
+    //scene.addCapsule({ vec3(-3, 2, 10), vec3(3, 2, 10), 1 , sf::Color::Red, "capsule 1"});
+    //scene.addPlane({ vec3(0,0,0), vec3(0,1,0) , sf::Color::White, "plane 1"});
+
+    //scene.writeToFile("test", "C:/Users/phhni/Desktop");
+    //scene.readFromFile("C:/Users/phhni/Desktop/test.rmsop");
     scene.sendToShader(&shader);
 
-    RMUI ui(&shader);
+    RMUI ui(&shader, &scene);
 
     sf::Clock deltaClock;
     sf::Clock time;
@@ -59,14 +64,12 @@ int main()
 
         ImGui::SFML::Update(window, deltaClock.restart());
 
-        ui.draw();
 
         window.clear();
 
-
+        ui.draw();
         window.draw(screen, 4, sf::Quads, &shader);
-        ImGui::SFML::Render(window);
-
+        ImGui::SFML::Render(window);;
 
         window.display();
     }

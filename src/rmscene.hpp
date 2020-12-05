@@ -8,6 +8,8 @@
 #include <SFML/System.hpp>
 #include <SFML/OpenGL.hpp>
 
+#include <string>
+
 typedef sf::Glsl::Vec4 vec4;
 typedef sf::Glsl::Vec3 vec3;
 typedef sf::Glsl::Vec2 vec2;
@@ -20,25 +22,38 @@ public:
 
 	struct sphere
 	{
-		vec4 sphere;
-		sf::Color color;
+		sphere(){}
+		sphere(vec4 _s, vec3 _color, std::string _name)
+			: s(_s), color(_color), name(_name) {}
+
+		vec4 s;
+		vec3 color;
+		std::string name;
 	};
 	
 	struct capsule
 	{
+		capsule(){}
+		capsule(vec3 _a, vec3 _b, float _r, vec3 _color, std::string _name)
+			: a(_a), b(_b), r(_r), color(_color), name(_name) {}
 		vec3 a;
 		vec3 b;
 		float r;
-		sf::Color color;
+		vec3 color;
+		std::string name;
 	};
 
 	struct plane
 	{
+		plane(){}
+		plane(vec3 _p, vec3 _n, vec3 _color, std::string _name)
+			: p(_p), n(_n), color(color), name(_name) {}
 		vec3 p;
 		vec3 n;
-		sf::Color color;
+		vec3 color;
+		std::string name;
 	};
-private:
+//private:
 
 	std::vector<sphere> spheres;
 	std::vector<capsule> capsules;
@@ -59,6 +74,8 @@ public:
 	void removeCapsule(UINT);
 	void removePlane(UINT);
 
+	bool writeToFile(std::string, std::string);
+	bool readFromFile(std::string);
 };
 
 #endif SCENE_H
