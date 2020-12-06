@@ -91,7 +91,7 @@ public:
 	void removePlane(UINT);
 	void removeCube(UINT);
 
-	bool writeToFile(std::string, std::string);
+	bool writeToFile(std::string);
 	bool readFromFile(std::string);
 };
 

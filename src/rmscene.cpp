@@ -199,14 +199,11 @@ void RMscene::removePlane(UINT i)
 		planes.erase(planes.begin() + i);
 }
 
-bool RMscene::writeToFile(std::string name, std::string path)
+bool RMscene::writeToFile(std::string path)
 {
 	std::ofstream file;
-	std::string filepath;
-	if (path != "")
-		filepath += path + "/";
-	filepath += name + ".rmsop";
-	file.open(filepath, std::ios::out);
+
+	file.open(path, std::ios::out);
 
 	if (!file.good())
 		return false;

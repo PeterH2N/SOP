@@ -50,6 +50,10 @@ add_custom_target(copy-files ALL
     ${CMAKE_BINARY_DIR}/res
     )
 
-add_executable(${CMAKE_PROJECT_NAME} ${SRC_FILES} ${HDR_FILES})
+include_directories(${PROJECT_SOURCE_DIR}/src/tinyfiledialogs)
+
+set_source_files_properties("${CMAKE_SOURCE_DIR}/src/tinyfiledialogs/tinyfiledialogs.c" PROPERTIES LANGUAGE CXX )
+
+add_executable(${CMAKE_PROJECT_NAME} ${SRC_FILES} ${HDR_FILES} "${CMAKE_SOURCE_DIR}/src/tinyfiledialogs/tinyfiledialogs.c" "${CMAKE_SOURCE_DIR}/src/tinyfiledialogs/tinyfiledialogs.h")
 add_dependencies(${CMAKE_PROJECT_NAME} copy-files)
 target_link_libraries(${CMAKE_PROJECT_NAME} sfml-audio sfml-graphics sfml-window sfml-system ImGui-SFML::ImGui-SFML)

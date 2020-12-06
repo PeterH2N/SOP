@@ -40,6 +40,12 @@ uniform vec4 cubeCol[50];
 uniform vec3 cubeRot[50];
 // ------------------------------- //
 
+// getting operations from main program //
+uniform uvec4 objects[50];
+uniform float operation[50];
+uniform int numOperations;
+// ------------------------------------ //
+
 struct distCol
 {
     float dist;
@@ -51,6 +57,22 @@ mat2 Rot(float a)
     float s = sin(a);
     float c = cos(a);
     return mat2(c, -s, s, c);
+}
+
+float bSubtract(float a, float b)
+{
+    return max(-a, b);
+}
+
+float bIntersect(float a, float b)
+{
+    return max(a, b);
+}
+
+float sMin(float a, float b, float k)
+{
+    float h = clamp(0.5 + 0.5 * (b - a) / k, 0., 1.);
+    return mix(b, a, h) - k * h * (1.0 - h);
 }
 
 
@@ -93,6 +115,10 @@ distCol sceneSDFCol(vec3 p)
     // spheres
     for (int i = 0; i < numSpheres; i++)
     {
+        /*for (int j = 0; j < numOperations; j++)
+        {
+            if (objects[j].x == 1 && objects[j].y ==)
+        }*/
         float dist = sphereSDF(p, sphere[i]);
         if (min.dist > dist)
         {

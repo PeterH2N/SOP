@@ -1,6 +1,8 @@
 #include "ui.hpp"
 #include <iostream>
 #include "misc/cpp/imgui_stdlib.h"
+#include "tinyfiledialogs.h"
+
 
 RMUI::RMUI(sf::Shader* _shader, RMscene* _scene)
     : shadow(true), color(true), shader(_shader), scene(_scene)
@@ -514,21 +516,14 @@ void RMUI::saveScene()
     if (ImGui::BeginPopupModal("Save Scene"))
     {
         static std::string path;
-        static std::string name;
-        ImGui::Text("Specify path for saved file");
-        ImGui::InputText("##1", &path);
-        ImGui::Text("Name");
-        ImGui::InputText("##2", &name);
-        if (ImGui::Button("Save"))
+        const char* const filename[] = { "*.rmsop" };
+        char* cpath;
+        cpath = tinyfd_saveFileDialog("Save File", "", 1, filename, "Scene file");
+        if (cpath != NULL)
         {
-            scene->writeToFile(name, path);
-            path = ""; name = "";
-            ImGui::CloseCurrentPopup();
-        }
-        ImGui::SameLine();
-        if (ImGui::Button("Cancel"))
-        {
-            path = ""; name = "";
+            path = cpath;
+            scene->writeToFile(path);
+            path = "";
             ImGui::CloseCurrentPopup();
         }
         ImGui::EndPopup();
@@ -540,18 +535,14 @@ void RMUI::openScene()
     if (ImGui::BeginPopupModal("Open Scene"))
     {
         static std::string path;
-        ImGui::Text("Specify path for file");
-        ImGui::InputText("##1", &path);
-        if (ImGui::Button("Open"))
+        const char* const filename[] = { "*.rmsop" };
+        char* cpath;
+        cpath = tinyfd_openFileDialog("Open Scene", "", 1, filename, "Scene files", 0);
+        if (cpath != NULL)
         {
+            path = cpath;
             scene->readFromFile(path);
             scene->sendToShader(shader);
-            path = "";
-            ImGui::CloseCurrentPopup();
-        }
-        ImGui::SameLine();
-        if (ImGui::Button("Cancel"))
-        {
             path = "";
             ImGui::CloseCurrentPopup();
         }

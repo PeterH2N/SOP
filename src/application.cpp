@@ -3,9 +3,9 @@
 #include <iostream>
 
 
-
 int main()
 {
+    
     sf::RenderWindow window(sf::VideoMode(1280, 720), "ImGui + SFML = <3");
 
     window.setFramerateLimit(240);
