@@ -266,7 +266,7 @@ bool RMscene::writeToFile(std::string name, std::string path)
 	}
 	output += "cubes\n";
 	output += std::to_string(cubes.size()) + "\n";
-	for (UINT i = 0; i < planes.size(); i++)
+	for (UINT i = 0; i < cubes.size(); i++)
 	{
 		output += cubes[i].name + "\n";
 

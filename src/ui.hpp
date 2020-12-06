@@ -9,6 +9,7 @@ public:
 	RMUI(sf::Shader*, RMscene*);
 private:
 	bool shadow;
+	bool color;
 
 
 	sf::Shader* shader;

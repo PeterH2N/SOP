@@ -3,9 +3,10 @@
 #include "misc/cpp/imgui_stdlib.h"
 
 RMUI::RMUI(sf::Shader* _shader, RMscene* _scene)
-    : shadow(true), shader(_shader), scene(_scene)
+    : shadow(true), color(true), shader(_shader), scene(_scene)
 {
     shader->setUniform("shadow", shadow);
+    shader->setUniform("color", color);
 }
 
 void RMUI::addSphereMenu()
@@ -478,6 +479,9 @@ void RMUI::shaderOptions()
     {
         if (ImGui::Checkbox("Shadows", &shadow))
             shader->setUniform("shadow", shadow);
+        if (ImGui::Checkbox("Colors", &color))
+            shader->setUniform("color", color);
+
         ImGui::TreePop();
     }
 }

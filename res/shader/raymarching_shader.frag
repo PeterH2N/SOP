@@ -9,6 +9,7 @@ out vec4 fragColor;
 uniform vec2 screenSize;
 uniform float time;
 uniform bool shadow;
+uniform bool color;
 
 // getting spheres from main program //
 uniform int numSpheres;
@@ -77,7 +78,13 @@ float sphereSDF(vec3 p, vec4 sphere)
 
 float cubeSDF(vec3 p, vec3 s)
 {
-    return length(max(abs(p) - s, 0.));
+    vec3 d = abs(p) - s;
+
+    float iD = min(max(d.x, max(d.y, d.z)), 0);
+
+    float oD = length(max(d, 0));
+
+    return iD + oD;
 }
 
 distCol sceneSDFCol(vec3 p)
@@ -236,20 +243,33 @@ float GetLight(vec3 p)
 void main()
 {
     vec2 uv = (gl_FragCoord.xy - .5 * screenSize) / min(screenSize.x, screenSize.y);
-    vec3 col = vec3(0);
+    vec3 col = vec3(1);
 
     vec3 ro = vec3(0, 2, 0);
     vec3 rd = normalize(vec3(uv.x, uv.y, 1)); 
 
-    distCol dc = RayMarchCol(ro, rd);
+    if (color)
+    {
+        distCol dc = RayMarchCol(ro, rd);
 
-    float d = dc.dist;
+        float d = dc.dist;
 
-    vec3 p =  ro + rd * d;
+        vec3 p =  ro + rd * d;
 
-    float dif = GetLight(p);
-    col = dc.col;
-    col *= dif;
+        float dif = GetLight(p);
+        col = dc.col;
+        col *= dif;
+    }
+    else
+    {
+        float d = RayMarch(ro, rd);
+
+        vec3 p = ro + rd * d;
+
+        float dif = GetLight(p);
+
+        col *= dif;
+    }
 
     fragColor = vec4(col, 1.0);
 };

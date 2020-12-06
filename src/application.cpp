@@ -8,7 +8,7 @@ int main()
 {
     sf::RenderWindow window(sf::VideoMode(1280, 720), "ImGui + SFML = <3");
 
-    window.setFramerateLimit(60);
+    window.setFramerateLimit(240);
     ImGui::SFML::Init(window);
 
     sf::Event event;
@@ -35,10 +35,23 @@ int main()
     //scene.addSphere({vec4(1, 1, 10, 1.5), sf::Color::White, "sphere 1"});
     //scene.addSphere({ vec4(-1, 1, 10, 1.5), sf::Color::Yellow, "sphere 2" });
     //scene.addCapsule({ vec3(-3, 2, 10), vec3(3, 2, 10), 1 , sf::Color::Red, "capsule 1"});
-    scene.addPlane({ vec3(0,0,0), vec3(0,1,0) , sf::Color(255,255,255), "plane 1"});
-    scene.addCube({ vec3(0, 0.5, 10), vec3(0.5, 0.5, 0.5), vec3(0, 45, 0), sf::Color::White, "cube 1" });
+    scene.addPlane({ vec3(0,0,0), vec3(0,1,0) , sf::Color(255,255,255), "Ground Plane"});
+    //scene.addCube({ vec3(0, 0.5, 10), vec3(0.5, 0.5, 0.5), vec3(0, 45, 0), sf::Color::White, "cube 1" });
 
     scene.sendToShader(&shader);
+
+    sf::Font font;
+    if (!font.loadFromFile("res/fonts/arial.ttf"))
+        std::cout << "Font did not load!";
+
+    sf::Text FPSText;
+
+    FPSText.setFont(font);
+    FPSText.setFillColor(sf::Color::Red);
+    FPSText.setCharacterSize(40);
+    FPSText.setPosition({ 10,10 });
+    FPSText.setStyle(sf::Text::Bold);
+
 
     RMUI ui(&shader, &scene);
 
@@ -61,15 +74,19 @@ int main()
 
         shader.setUniform("time", (float)time.getElapsedTime().asSeconds());
 
+        // FPS
+        int fps = 1.0f / (float)deltaClock.getElapsedTime().asSeconds();
+        FPSText.setString(std::to_string(fps));
+        // FPS
+
         ImGui::SFML::Update(window, deltaClock.restart());
-
-
         window.clear();
 
         ui.draw();
         window.draw(screen, 4, sf::Quads, &shader);
         ImGui::SFML::Render(window);;
 
+        window.draw(FPSText);
         window.display();
     }
 
