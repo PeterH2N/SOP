@@ -293,6 +293,202 @@ void RMUI::capsuleList()
     }
 }
 
+void RMUI::addCubeMenu()
+{
+    if (ImGui::BeginPopupModal("Add Cube"))
+    {
+        static vec3 cubeP;
+        static vec3 cubeS;
+        static std::string name;
+        static float color[3];
+
+        ImGui::Text("Center Point");
+        ImGui::PushItemWidth(50);
+        ImGui::InputFloat("x##1", &cubeP.x); ImGui::SameLine();
+        ImGui::InputFloat("y##1", &cubeP.y); ImGui::SameLine();
+        ImGui::InputFloat("z##1", &cubeP.z);
+
+        ImGui::Text("Size");
+        ImGui::PushItemWidth(50);
+        ImGui::InputFloat("W", &cubeS.x); ImGui::SameLine();
+        ImGui::InputFloat("B", &cubeS.z); ImGui::SameLine();
+        ImGui::InputFloat("H", &cubeS.y);
+
+        ImGui::PushItemWidth(100);
+        ImGui::ColorEdit3("Color", color);
+        ImGui::PushItemWidth(100);
+        ImGui::InputText("Name", &name);
+        ImGui::PopItemWidth();
+
+        if (ImGui::Button("Add"))
+        {
+            int r = color[0] * 255.0f;
+            int g = color[1] * 255.0f;
+            int b = color[2] * 255.0f;
+            if (name == "")
+                name = "Cube " + std::to_string(scene->capsules.size() + 1);
+
+            scene->addCube({ cubeP, cubeS, sf::Color(r, g, b), name });
+            scene->sendToShader(shader);
+            cubeP = vec3(); cubeS = vec3(); name = ""; color[0] = 0; color[1] = 0; color[2] = 0;
+            ImGui::CloseCurrentPopup();
+
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Cancel"))
+        {
+            cubeP = vec3(); cubeS = vec3(); name = ""; color[0] = 0; color[1] = 0; color[2] = 0;
+            ImGui::CloseCurrentPopup();
+        }
+        ImGui::EndPopup();
+    }
+}
+
+void RMUI::editCubeMenu(UINT index)
+{
+    if (ImGui::BeginPopupModal("Edit Cube"))
+    {
+        static vec3 cubeP;
+        static vec3 cubeS;
+        static std::string name;
+        static float color[3];
+        static bool isEditingCube = false;
+
+        if (!isEditingCube)
+        {
+            cubeP = scene->cubes[index].p;
+            cubeS = scene->cubes[index].s;
+            name = scene->cubes[index].name;
+            color[0] = scene->cubes[index].color.r / 225.0f;
+            color[1] = scene->cubes[index].color.g / 225.0f;
+            color[2] = scene->cubes[index].color.b / 225.0f;
+            isEditingCube = true;
+        }
+
+        ImGui::Text("Center Point");
+        ImGui::PushItemWidth(50);
+        ImGui::InputFloat("x##1", &cubeP.x); ImGui::SameLine();
+        ImGui::InputFloat("y##1", &cubeP.y); ImGui::SameLine();
+        ImGui::InputFloat("z##1", &cubeP.z);
+
+        ImGui::Text("Size");
+        ImGui::PushItemWidth(50);
+        ImGui::InputFloat("W", &cubeS.x); ImGui::SameLine();
+        ImGui::InputFloat("B", &cubeS.z); ImGui::SameLine();
+        ImGui::InputFloat("H", &cubeS.y);
+
+        ImGui::PushItemWidth(100);
+        ImGui::ColorEdit3("Color", color);
+        ImGui::PushItemWidth(100);
+        ImGui::InputText("Name", &name);
+        ImGui::PopItemWidth();
+
+        if (ImGui::Button("Apply"))
+        {
+            int r = color[0] * 255.0f;
+            int g = color[1] * 255.0f;
+            int b = color[2] * 255.0f;
+            if (name == "")
+                name = "Cube " + std::to_string(scene->capsules.size() + 1);
+
+            scene->changeCube(index, { cubeP, cubeS, sf::Color(r, g, b), name });
+            scene->sendToShader(shader);
+            //cubeP = vec3(); cubeS = vec3(); name = ""; color[0] = 0; color[1] = 0; color[2] = 0;
+            isEditingCube = false;
+            ImGui::CloseCurrentPopup();
+
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Cancel"))
+        {
+            //cubeP = vec3(); cubeS = vec3(); name = ""; color[0] = 0; color[1] = 0; color[2] = 0;
+            isEditingCube = false;
+            ImGui::CloseCurrentPopup();
+        }
+        ImGui::EndPopup();
+    }
+}
+
+void RMUI::cubeList()
+{
+    if (ImGui::Button("+", { 18,18 }))
+        ImGui::OpenPopup("Add Cube");
+    addCubeMenu();
+    ImGui::Separator();
+    for (UINT i = 0; i < scene->cubes.size(); i++)
+    {
+        ImGui::PushID(i);
+        ImGui::Text(scene->cubes[i].name.c_str()); ImGui::SameLine(ImGui::GetWindowWidth() - 110);
+
+        if (ImGui::Button("Edit"))
+            ImGui::OpenPopup("Edit Cube");
+        editCubeMenu(i);
+
+        ImGui::SameLine();
+        if (ImGui::Button("Remove"))
+        {
+            scene->removeCapsule(i);
+            scene->sendToShader(shader);
+        }
+        ImGui::Separator();
+        ImGui::PopID();
+
+    }
+}
+
+void RMUI::menu()
+{
+    std::string menuAction = "";
+
+    ImGui::BeginMenuBar();
+    if (ImGui::BeginMenu("File"))
+    {
+        if (ImGui::MenuItem("Save"))
+            menuAction = "save";
+        if (ImGui::MenuItem("Open"))
+            menuAction = "open";
+        ImGui::EndMenu();
+    }
+    if (menuAction == "save")   ImGui::OpenPopup("Save Scene");
+    else if (menuAction == "open") ImGui::OpenPopup("Open Scene");
+
+    saveScene();
+    openScene();
+
+}
+
+void RMUI::shaderOptions()
+{
+    if (ImGui::TreeNode("Shader Options"))
+    {
+        if (ImGui::Checkbox("Shadows", &shadow))
+            shader->setUniform("shadow", shadow);
+        ImGui::TreePop();
+    }
+}
+
+void RMUI::objects()
+{
+    if (ImGui::TreeNode("Objects"))
+    {
+        if (ImGui::TreeNode("Spheres"))
+        {
+            sphereList();
+            ImGui::TreePop();
+        }
+        if (ImGui::TreeNode("Capsules"))
+        {
+            capsuleList();
+            ImGui::TreePop();
+        }
+        if (ImGui::TreeNode("Cubes"))
+        {
+            cubeList();
+            ImGui::TreePop();
+        }
+    }
+}
+
 void RMUI::saveScene()
 {
     if (ImGui::BeginPopupModal("Save Scene"))
@@ -349,48 +545,19 @@ void RMUI::openScene()
 
 void RMUI::draw()
 {
-    std::string menuAction = "";
+
     if (!ImGui::Begin("Options"))
     {
         // Early out if the window is collapsed, as an optimization.
         ImGui::End();
         return;
     }
- 
-    ImGui::BeginMenuBar();
-    if (ImGui::BeginMenu("File"))
-    {
-        if (ImGui::MenuItem("Save"))
-            menuAction = "save";
-        if (ImGui::MenuItem("Open"))
-            menuAction = "open";
-        ImGui::EndMenu();
-    }
-    if (menuAction == "save")   ImGui::OpenPopup("Save Scene");
-    else if (menuAction == "open") ImGui::OpenPopup("Open Scene");
 
-    saveScene();
-    openScene();
+    menu();
 
-    if (ImGui::TreeNode("Shader Options"))
-    {
-        if (ImGui::Checkbox("Shadows", &shadow))
-            shader->setUniform("shadow", shadow);
-        ImGui::TreePop();
-    }
-    if (ImGui::TreeNode("Objects"))
-    {
-        if (ImGui::TreeNode("Spheres"))
-        {
-            sphereList();
-            ImGui::TreePop();
-        }
-        if (ImGui::TreeNode("Capsules"))
-        {
-            capsuleList();
-            ImGui::TreePop();
-        }
-    }
+    shaderOptions();
+
+    objects();
 
     ImGui::End();
 }

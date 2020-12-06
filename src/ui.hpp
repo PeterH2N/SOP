@@ -22,6 +22,14 @@ private:
 	void editCapsuleMenu(UINT);
 	void capsuleList();
 
+	void addCubeMenu();
+	void editCubeMenu(UINT);
+	void cubeList();
+
+	void menu();
+	void shaderOptions();
+	void objects();
+
 	void saveScene();
 	void openScene();
 public:

@@ -35,7 +35,8 @@ int main()
     //scene.addSphere({vec4(1, 1, 10, 1.5), sf::Color::White, "sphere 1"});
     //scene.addSphere({ vec4(-1, 1, 10, 1.5), sf::Color::Yellow, "sphere 2" });
     //scene.addCapsule({ vec3(-3, 2, 10), vec3(3, 2, 10), 1 , sf::Color::Red, "capsule 1"});
-    //scene.addPlane({ vec3(0,0,0), vec3(0,1,0) , sf::Color(255,255,255), "plane 1"});
+    scene.addPlane({ vec3(0,0,0), vec3(0,1,0) , sf::Color(255,255,255), "plane 1"});
+    //scene.addCube({ vec3(0, 0.5, 10), vec3(0.5, 0.5, 0.5), sf::Color::Blue, "cube 1" });
 
     scene.sendToShader(&shader);
 

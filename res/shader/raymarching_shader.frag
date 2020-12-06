@@ -4,30 +4,39 @@
 #define MAX_DIST 100.
 #define SURF_DIST 0.01
 
+out vec4 fragColor;
+
 uniform vec2 screenSize;
 uniform float time;
 uniform bool shadow;
 
 // getting spheres from main program //
 uniform int numSpheres;
-uniform vec4 sphere[100];
-uniform vec4 sphereCol[100];
+uniform vec4 sphere[50];
+uniform vec4 sphereCol[50];
 // ----------------------------------//
 
 // getting capsules from main program //
 uniform int numCaps;
-uniform vec3 capsuleA[100];
-uniform vec3 capsuleB[100];
-uniform float capsuleR[100];
-uniform vec4 capsuleCol[100];
+uniform vec3 capsuleA[50];
+uniform vec3 capsuleB[50];
+uniform float capsuleR[50];
+uniform vec4 capsuleCol[50];
 // --------------------------------- //
 
 // getting planes from main program //
 uniform int numPlanes;
-uniform vec3 planeP[100];
-uniform vec3 planeN[100];
-uniform vec4 planeCol[100];
+uniform vec3 planeP[20];
+uniform vec3 planeN[20];
+uniform vec4 planeCol[20];
 // -------------------------------- //
+
+// getting cubes from main program //
+uniform int numCubes;
+uniform vec3 cubeP[50];
+uniform vec3 cubeS[50];
+uniform vec4 cubeCol[50];
+// ------------------------------- //
 
 struct distCol
 {
@@ -56,6 +65,11 @@ float planeSDF(vec3 p, vec3 pp, vec3 n)
 float sphereSDF(vec3 p, vec4 sphere)
 {
         return length(p - sphere.xyz) - sphere.w;
+}
+
+float cubeSDF(vec3 p, vec3 c, vec3 s)
+{
+    return length(max(abs(p - c) - s, 0.));
 }
 
 distCol sceneSDFCol(vec3 p)
@@ -88,6 +102,16 @@ distCol sceneSDFCol(vec3 p)
             min = distCol(dist, planeCol[i].xyz);
         }
     }
+    // cubes
+    for (int i = 0; i < numCubes; i++)
+    {
+        float dist = cubeSDF(p, cubeP[i], cubeS[i]);
+        if (min.dist > dist)
+        {
+            min = distCol(dist, cubeCol[i].xyz);
+        }
+    }
+    
 
     return min;
 }
@@ -109,6 +133,12 @@ float sceneSDF(vec3 p)
     {
         minD = min(minD, planeSDF(p, planeP[i], planeN[i]));
     }
+    // cubes
+    for (int i = 0; i < numCubes; i++)
+    {
+        minD = min(minD, cubeSDF(p, cubeP[i], cubeS[i]));
+    }
+
 
     return minD;
 }
@@ -197,5 +227,5 @@ void main()
     col = dc.col;
     col *= dif;
 
-    gl_FragColor = vec4(col, 1.0);
+    fragColor = vec4(col, 1.0);
 };

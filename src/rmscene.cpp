@@ -89,7 +89,6 @@ void RMscene::sendToShader(sf::Shader* shader)
 			pp[i] = planes[i].p;
 			pn[i] = planes[i].n;
 			pc[i] = vec4((float)planes[i].color.g / 255.0f, (float)planes[i].color.g / 255.0f, (float)planes[i].color.b / 255.0f, 1.0f);
-			std::cout << (int)i << std::endl;
 		}
 		vec3* upp = pp.data();
 		vec3* upn = pn.data();
@@ -108,7 +107,35 @@ void RMscene::sendToShader(sf::Shader* shader)
 		shader->setUniformArray("planeCol", &vec4(), 0);
 	}
 
+	// cubes
+	size = cubes.size();
+	if (size > 0)
+	{
+		std::vector<vec3> cp(size, vec3());
+		std::vector<vec3> cs(size, vec3());
+		std::vector<vec4> cc(size, vec4());
+		for (UINT i = 0; i < size; i++)
+		{
+			cp[i] = cubes[i].p;
+			cs[i] = cubes[i].s;
+			cc[i] = vec4((float)cubes[i].color.g / 255.0f, (float)cubes[i].color.g / 255.0f, (float)cubes[i].color.b / 255.0f, 1.0f);
+		}
+		vec3* ucp = cp.data();
+		vec3* ucs = cs.data();
+		vec4* ucc = cc.data();
 
+		shader->setUniformArray("cubeP", ucp, size);
+		shader->setUniformArray("cubeS", ucs, size);
+		shader->setUniform("numCubes", size);
+		shader->setUniformArray("cubeCol", ucc, size);
+	}
+	else
+	{
+		shader->setUniformArray("cubeP", &vec3(), 0);
+		shader->setUniformArray("cubeS", &vec3(), 0);
+		shader->setUniform("numCubes", 0);
+		shader->setUniformArray("cubeCol", &vec4(), 0);
+	}
 }
 
 void RMscene::addSphere(RMscene::sphere s)
@@ -164,7 +191,12 @@ void RMscene::removePlane(UINT i)
 
 bool RMscene::writeToFile(std::string name, std::string path)
 {
-	std::ofstream file(path + "/" + (name + ".rmsop"));
+	std::ofstream file;
+	std::string filepath;
+	if (path != "")
+		filepath += path + "/";
+	filepath += name + ".rmsop";
+	file.open(filepath, std::ios::out);
 
 	if (!file.good())
 		return false;
@@ -224,6 +256,24 @@ bool RMscene::writeToFile(std::string name, std::string path)
 		output += std::to_string(planes[i].color.r) + " "
 			+ std::to_string(planes[i].color.g) + " "
 			+ std::to_string(planes[i].color.b) + "\n";
+	}
+	output += "cubes\n";
+	output += std::to_string(cubes.size()) + "\n";
+	for (UINT i = 0; i < planes.size(); i++)
+	{
+		output += cubes[i].name + "\n";
+
+		output += std::to_string(cubes[i].p.x) + " "
+			+ std::to_string(cubes[i].p.y) + " "
+			+ std::to_string(cubes[i].p.z) + "\n";
+
+		output += std::to_string(cubes[i].s.x) + " "
+			+ std::to_string(cubes[i].s.y) + " "
+			+ std::to_string(cubes[i].s.z) + "\n";
+
+		output += std::to_string(cubes[i].color.r) + " "
+			+ std::to_string(cubes[i].color.g) + " "
+			+ std::to_string(cubes[i].color.b) + "\n";
 	}
 	output += "END";
 
@@ -367,8 +417,67 @@ bool RMscene::readFromFile(std::string path)
 
 		New.planes.push_back(current);
 	}
+	std::getline(file, line);
+	std::getline(file, line);
+	numObjects = std::stoi(line);
+	for (UINT i = 0; i < numObjects; i++)
+	{
+		cube current;
+		std::getline(file, line);
+		current.name = line;
+
+		std::getline(file, line);
+		ci = line.find(" ");
+		current.p.x = std::stof(line.substr(0, ci));
+		li = ci + 1;
+		ci = line.find(" ", li);
+		current.p.y = std::stof(line.substr(li, ci));
+		li = ci + 1;
+		ci = line.find(" ", li);
+		current.p.z = std::stof(line.substr(li, ci));
+
+		std::getline(file, line);
+		ci = line.find(" ");
+		current.s.x = std::stof(line.substr(0, ci));
+		li = ci + 1;
+		ci = line.find(" ", li);
+		current.s.y = std::stof(line.substr(li, ci));
+		li = ci + 1;
+		ci = line.find(" ", li);
+		current.s.z = std::stof(line.substr(li, ci));
+
+		std::getline(file, line);
+		ci = line.find(" ");
+		current.color.r = std::stoi(line.substr(0, ci));
+		li = ci + 1;
+		ci = line.find(" ", li);
+		current.color.g = std::stoi(line.substr(li, ci));
+		li = ci + 1;
+		ci = line.find(" ", li);
+		current.color.b = std::stoi(line.substr(li, ci));
+
+		New.cubes.push_back(current);
+
+	}
 
 	*this = New;
 
 	return true;
+}
+
+void RMscene::addCube(RMscene::cube c)
+{
+	cubes.push_back(c);
+}
+
+void RMscene::changeCube(UINT i, RMscene::cube c)
+{
+	if (i < cubes.size())
+		cubes[i] = c;
+}
+
+void RMscene::removeCube(UINT i)
+{
+	if (i < cubes.size())
+		cubes.erase(cubes.begin() + i);
 }
