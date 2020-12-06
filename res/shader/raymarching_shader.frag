@@ -36,6 +36,7 @@ uniform int numCubes;
 uniform vec3 cubeP[50];
 uniform vec3 cubeS[50];
 uniform vec4 cubeCol[50];
+uniform vec3 cubeRot[50];
 // ------------------------------- //
 
 struct distCol
@@ -43,6 +44,13 @@ struct distCol
     float dist;
     vec3 col;
 };
+
+mat2 Rot(float a)
+{
+    float s = sin(a);
+    float c = cos(a);
+    return mat2(c, -s, s, c);
+}
 
 
 float capsuleSDF(vec3 p, vec3 a, vec3 b, float r)
@@ -67,9 +75,9 @@ float sphereSDF(vec3 p, vec4 sphere)
         return length(p - sphere.xyz) - sphere.w;
 }
 
-float cubeSDF(vec3 p, vec3 c, vec3 s)
+float cubeSDF(vec3 p, vec3 s)
 {
-    return length(max(abs(p - c) - s, 0.));
+    return length(max(abs(p) - s, 0.));
 }
 
 distCol sceneSDFCol(vec3 p)
@@ -105,7 +113,15 @@ distCol sceneSDFCol(vec3 p)
     // cubes
     for (int i = 0; i < numCubes; i++)
     {
-        float dist = cubeSDF(p, cubeP[i], cubeS[i]);
+        vec3 cp = p - cubeP[i];
+        if (cubeRot[i].x > 0)
+            cp.yz *= Rot(cubeRot[i].x);
+        if (cubeRot[i].y > 0)
+            cp.xz *= Rot(cubeRot[i].y);
+        if (cubeRot[i].z > 0)
+            cp.xy *= Rot(cubeRot[i].z);
+
+        float dist = cubeSDF(cp, cubeS[i]);
         if (min.dist > dist)
         {
             min = distCol(dist, cubeCol[i].xyz);
@@ -136,7 +152,15 @@ float sceneSDF(vec3 p)
     // cubes
     for (int i = 0; i < numCubes; i++)
     {
-        minD = min(minD, cubeSDF(p, cubeP[i], cubeS[i]));
+        vec3 cp = p - cubeP[i];
+        if (cubeRot[i].x > 0)
+            cp.yz *= Rot(cubeRot[i].x);
+        if (cubeRot[i].y > 0)
+            cp.xz *= Rot(cubeRot[i].y);
+        if (cubeRot[i].z > 0)
+            cp.xy *= Rot(cubeRot[i].z);
+
+        minD = min(minD, cubeSDF(cp, cubeS[i]));
     }
 
 
@@ -214,7 +238,7 @@ void main()
     vec2 uv = (gl_FragCoord.xy - .5 * screenSize) / min(screenSize.x, screenSize.y);
     vec3 col = vec3(0);
 
-    vec3 ro = vec3(0, 4, 0);
+    vec3 ro = vec3(0, 2, 0);
     vec3 rd = normalize(vec3(uv.x, uv.y, 1)); 
 
     distCol dc = RayMarchCol(ro, rd);

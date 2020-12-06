@@ -299,6 +299,7 @@ void RMUI::addCubeMenu()
     {
         static vec3 cubeP;
         static vec3 cubeS;
+        static vec3 cubeR;
         static std::string name;
         static float color[3];
 
@@ -313,6 +314,12 @@ void RMUI::addCubeMenu()
         ImGui::InputFloat("W", &cubeS.x); ImGui::SameLine();
         ImGui::InputFloat("B", &cubeS.z); ImGui::SameLine();
         ImGui::InputFloat("H", &cubeS.y);
+
+        ImGui::Text("Rotation (degrees)");
+        ImGui::PushItemWidth(50);
+        ImGui::InputFloat("x", &cubeR.x); ImGui::SameLine();
+        ImGui::InputFloat("y", &cubeR.y); ImGui::SameLine();
+        ImGui::InputFloat("z", &cubeR.z);
 
         ImGui::PushItemWidth(100);
         ImGui::ColorEdit3("Color", color);
@@ -328,16 +335,16 @@ void RMUI::addCubeMenu()
             if (name == "")
                 name = "Cube " + std::to_string(scene->capsules.size() + 1);
 
-            scene->addCube({ cubeP, cubeS, sf::Color(r, g, b), name });
+            scene->addCube({ cubeP, cubeS, cubeR, sf::Color(r, g, b), name });
             scene->sendToShader(shader);
-            cubeP = vec3(); cubeS = vec3(); name = ""; color[0] = 0; color[1] = 0; color[2] = 0;
+            cubeP = vec3(); cubeS = vec3(); cubeR = vec3(); name = ""; color[0] = 0; color[1] = 0; color[2] = 0;
             ImGui::CloseCurrentPopup();
 
         }
         ImGui::SameLine();
         if (ImGui::Button("Cancel"))
         {
-            cubeP = vec3(); cubeS = vec3(); name = ""; color[0] = 0; color[1] = 0; color[2] = 0;
+            cubeP = vec3(); cubeS = vec3(); cubeR = vec3(); name = ""; color[0] = 0; color[1] = 0; color[2] = 0;
             ImGui::CloseCurrentPopup();
         }
         ImGui::EndPopup();
@@ -350,18 +357,20 @@ void RMUI::editCubeMenu(UINT index)
     {
         static vec3 cubeP;
         static vec3 cubeS;
+        static vec3 cubeR;
         static std::string name;
-        static float color[3];
+        static float cubecolor[3];
         static bool isEditingCube = false;
 
         if (!isEditingCube)
         {
             cubeP = scene->cubes[index].p;
             cubeS = scene->cubes[index].s;
+            cubeR = scene->cubes[index].r;
             name = scene->cubes[index].name;
-            color[0] = scene->cubes[index].color.r / 225.0f;
-            color[1] = scene->cubes[index].color.g / 225.0f;
-            color[2] = scene->cubes[index].color.b / 225.0f;
+            cubecolor[0] = scene->cubes[index].color.r / 225.0f;
+            cubecolor[1] = scene->cubes[index].color.g / 225.0f;
+            cubecolor[2] = scene->cubes[index].color.b / 225.0f;
             isEditingCube = true;
         }
 
@@ -377,21 +386,27 @@ void RMUI::editCubeMenu(UINT index)
         ImGui::InputFloat("B", &cubeS.z); ImGui::SameLine();
         ImGui::InputFloat("H", &cubeS.y);
 
+        ImGui::Text("Rotation (degrees)");
+        ImGui::PushItemWidth(50);
+        ImGui::InputFloat("x", &cubeR.x); ImGui::SameLine();
+        ImGui::InputFloat("y", &cubeR.y); ImGui::SameLine();
+        ImGui::InputFloat("z", &cubeR.z);
+
         ImGui::PushItemWidth(100);
-        ImGui::ColorEdit3("Color", color);
+        ImGui::ColorEdit3("Color", cubecolor);
         ImGui::PushItemWidth(100);
         ImGui::InputText("Name", &name);
         ImGui::PopItemWidth();
 
         if (ImGui::Button("Apply"))
         {
-            int r = color[0] * 255.0f;
-            int g = color[1] * 255.0f;
-            int b = color[2] * 255.0f;
+            int r = cubecolor[0] * 255.0f;
+            int g = cubecolor[1] * 255.0f;
+            int b = cubecolor[2] * 255.0f;
             if (name == "")
                 name = "Cube " + std::to_string(scene->capsules.size() + 1);
 
-            scene->changeCube(index, { cubeP, cubeS, sf::Color(r, g, b), name });
+            scene->changeCube(index, { cubeP, cubeS, cubeR, sf::Color(r, g, b), name });
             scene->sendToShader(shader);
             //cubeP = vec3(); cubeS = vec3(); name = ""; color[0] = 0; color[1] = 0; color[2] = 0;
             isEditingCube = false;
@@ -427,7 +442,7 @@ void RMUI::cubeList()
         ImGui::SameLine();
         if (ImGui::Button("Remove"))
         {
-            scene->removeCapsule(i);
+            scene->removeCube(i);
             scene->sendToShader(shader);
         }
         ImGui::Separator();

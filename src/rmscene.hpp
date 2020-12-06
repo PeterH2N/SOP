@@ -58,10 +58,11 @@ public:
 	struct cube
 	{
 		cube() {};
-		cube(vec3 _p, vec3 _s, sf::Color _color, std::string _name)
-			: p(_p), s(_s), color(_color), name(_name) {}
+		cube(vec3 _p, vec3 _s, vec3 _r, sf::Color _color, std::string _name)
+			: p(_p), s(_s), r(_r), color(_color), name(_name) {}
 		vec3 p;
 		vec3 s;
+		vec3 r;
 		sf::Color color;
 		std::string name;
 	};

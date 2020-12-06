@@ -3,6 +3,8 @@
 #include <istream>
 #include <iostream>
 
+#define M_PI 3.14159265359f
+
 
 RMscene::RMscene()
 {
@@ -114,18 +116,22 @@ void RMscene::sendToShader(sf::Shader* shader)
 		std::vector<vec3> cp(size, vec3());
 		std::vector<vec3> cs(size, vec3());
 		std::vector<vec4> cc(size, vec4());
+		std::vector<vec3> cr(size, vec3());
 		for (UINT i = 0; i < size; i++)
 		{
 			cp[i] = cubes[i].p;
 			cs[i] = cubes[i].s;
-			cc[i] = vec4((float)cubes[i].color.g / 255.0f, (float)cubes[i].color.g / 255.0f, (float)cubes[i].color.b / 255.0f, 1.0f);
+			cc[i] = vec4((float)cubes[i].color.r / 255.0f, (float)cubes[i].color.g / 255.0f, (float)cubes[i].color.b / 255.0f, 1.0f);
+			cr[i] = vec3(cubes[i].r.x * M_PI / 180.0f, cubes[i].r.y * M_PI / 180.0f, cubes[i].r.z * M_PI / 180.0f);
 		}
 		vec3* ucp = cp.data();
 		vec3* ucs = cs.data();
 		vec4* ucc = cc.data();
+		vec3* ucr = cr.data();
 
 		shader->setUniformArray("cubeP", ucp, size);
 		shader->setUniformArray("cubeS", ucs, size);
+		shader->setUniformArray("cubeRot", ucr, size);
 		shader->setUniform("numCubes", size);
 		shader->setUniformArray("cubeCol", ucc, size);
 	}
@@ -133,6 +139,7 @@ void RMscene::sendToShader(sf::Shader* shader)
 	{
 		shader->setUniformArray("cubeP", &vec3(), 0);
 		shader->setUniformArray("cubeS", &vec3(), 0);
+		shader->setUniformArray("cubeRot", &vec3(), 0);
 		shader->setUniform("numCubes", 0);
 		shader->setUniformArray("cubeCol", &vec4(), 0);
 	}
@@ -270,6 +277,10 @@ bool RMscene::writeToFile(std::string name, std::string path)
 		output += std::to_string(cubes[i].s.x) + " "
 			+ std::to_string(cubes[i].s.y) + " "
 			+ std::to_string(cubes[i].s.z) + "\n";
+
+		output += std::to_string(cubes[i].r.x) + " "
+			+ std::to_string(cubes[i].r.y) + " "
+			+ std::to_string(cubes[i].r.z) + "\n";
 
 		output += std::to_string(cubes[i].color.r) + " "
 			+ std::to_string(cubes[i].color.g) + " "
@@ -445,6 +456,16 @@ bool RMscene::readFromFile(std::string path)
 		li = ci + 1;
 		ci = line.find(" ", li);
 		current.s.z = std::stof(line.substr(li, ci));
+
+		std::getline(file, line);
+		ci = line.find(" ");
+		current.r.x = std::stof(line.substr(0, ci));
+		li = ci + 1;
+		ci = line.find(" ", li);
+		current.r.y = std::stof(line.substr(li, ci));
+		li = ci + 1;
+		ci = line.find(" ", li);
+		current.r.z = std::stof(line.substr(li, ci));
 
 		std::getline(file, line);
 		ci = line.find(" ");
