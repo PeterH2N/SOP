@@ -10,12 +10,12 @@ RMUI::RMUI(sf::Shader* _shader, RMscene* _scene)
 
 void RMUI::addSphereMenu()
 {
-    static float x, y, z;
-    static float radius;
-    static float color[3];
-    static std::string name;
     if (ImGui::BeginPopupModal("Add Sphere"))
     {
+        static float x, y, z;
+        static float radius;
+        static float color[3];
+        static std::string name;
         ImGui::Text("Center");
         ImGui::PushItemWidth(50);
         ImGui::InputFloat("x", &x); ImGui::SameLine();
@@ -31,22 +31,21 @@ void RMUI::addSphereMenu()
 
         if (ImGui::Button("Add") && radius != 0)
         {
-            int r = color[0];
-            int g = color[1];
-            int b = color[2];
+            int r = color[0] * 255.0f;
+            int g = color[1] * 255.0f;
+            int b = color[2] * 255.0f;
             if (name == "")
             {
                 std::string hi = std::to_string(scene->spheres.size() + 1);
                 name = "Sphere " + hi;
             }
 
-            scene->addSphere(RMscene::sphere(vec4(x, y, z, radius), vec3(r, g, b), name));
+            scene->addSphere(RMscene::sphere(vec4(x, y, z, radius), sf::Color(r, g, b), name));
             scene->sendToShader(shader);
 
             ImGui::CloseCurrentPopup();
             x = 0; y = 0; z = 0; radius = 0, color[0] = 0; color[1] = 0; color[2] = 0;
             name = "";
-            return;
         }
         ImGui::SameLine();
         if (ImGui::Button("Cancel"))
@@ -54,7 +53,6 @@ void RMUI::addSphereMenu()
             ImGui::CloseCurrentPopup();
             x = 0; y = 0; z = 0; radius = 0, color[0] = 0; color[1] = 0; color[2] = 0;
             name = "";
-            return;
         }
         ImGui::EndPopup();
     }
@@ -62,24 +60,37 @@ void RMUI::addSphereMenu()
 
 void RMUI::editSphereMenu(UINT index)
 {
-    //static float x = scene->spheres[index].s.x, y = scene->spheres[index].s.y, z = scene->spheres[index].s.z;
-    //static float radius = scene->spheres[index].s.w;
-    //static std::string name = scene->spheres[index].name;
-    //ImGui::BeginChild("Edit Sphere", { 220,150 }, true);
     if (ImGui::BeginPopupModal("Edit Sphere"))
     {
+        static float x, y, z;
+        static float radius;
+        static float color[3];
+        static std::string name;
+        static bool isEditing = false;
+
+        if (!isEditing)
+        {
+            x = scene->spheres[index].s.x, y = scene->spheres[index].s.y, z = scene->spheres[index].s.z;
+            radius = scene->spheres[index].s.w;
+            name = scene->spheres[index].name;
+            color[0] = (float)scene->spheres[index].color.r / 255.0f;
+            color[1] = (float)scene->spheres[index].color.g / 255.0f;
+            color[2] = (float)scene->spheres[index].color.b / 255.0f;
+            isEditing = true;
+        }
+
         ImGui::Text("Center");
         ImGui::PushItemWidth(50);
-        ImGui::InputFloat("x", &scene->spheres[index].s.x); ImGui::SameLine();
-        ImGui::InputFloat("y", &scene->spheres[index].s.y); ImGui::SameLine();
-        ImGui::InputFloat("z", &scene->spheres[index].s.z);
+        ImGui::InputFloat("x", &x); ImGui::SameLine();
+        ImGui::InputFloat("y", &y); ImGui::SameLine();
+        ImGui::InputFloat("z", &z);
 
         ImGui::Text("Radius"); ImGui::SameLine();
-        ImGui::InputFloat("", &scene->spheres[index].s.w);
+        ImGui::InputFloat("", &radius);
         ImGui::PushItemWidth(100);
-        ImGui::ColorEdit3("Color", &scene->spheres[index].color[0]);
+        ImGui::ColorEdit3("Color", color);
         ImGui::PopItemWidth();
-        ImGui::InputText("Name", &scene->spheres[index].name);
+        ImGui::InputText("Name", &name);
 
         if (ImGui::Button("Apply") && radius != 0)
         {
@@ -92,23 +103,21 @@ void RMUI::editSphereMenu(UINT index)
             scene->changeSphere(index, RMscene::sphere(vec4(x, y, z, radius), sf::Color(r, g, b), name));
             scene->sendToShader(shader);
             
-            ImGui::CloseCurrentPopup();
-            x = 0; y = 0; z = 0; radius = 0, color[0] = 0; color[1] = 0; color[2] = 0;
+            //x = 0; y = 0; z = 0; radius = 0, color[0] = 0; color[1] = 0; color[2] = 0;
             name = "";
-            return;
+            isEditing = false;
+            ImGui::CloseCurrentPopup();
         }
         ImGui::SameLine();
         if (ImGui::Button("Cancel"))
         {
-            ImGui::CloseCurrentPopup();
-            x = 0; y = 0; z = 0; radius = 0, color[0] = 0; color[1] = 0; color[2] = 0;
+            //x = 0; y = 0; z = 0; radius = 0, color[0] = 0; color[1] = 0; color[2] = 0;
             name = "";
-            return;
+            isEditing = false;
+            ImGui::CloseCurrentPopup();
         }
         ImGui::EndPopup();
     }
-
-    //ImGui::EndChild();
 }
 
 void RMUI::sphereList()
@@ -140,11 +149,11 @@ void RMUI::sphereList()
 
 void RMUI::addCapsuleMenu()
 {
-    static float ax, ay, az, bx, by, bz, radius;
-    static float color[3];
-    static std::string name;
     if (ImGui::BeginPopupModal("Add Capsule"))
     {
+        static float ax, ay, az, bx, by, bz, radius;
+        static float color[3];
+        static std::string name;
         ImGui::Text("Point A");
         ImGui::PushItemWidth(50);
         ImGui::InputFloat("x##1", &ax); ImGui::SameLine();
@@ -166,25 +175,23 @@ void RMUI::addCapsuleMenu()
 
         if (ImGui::Button("Add"))
         {
-            int r = color[0];
-            int g = color[1];
-            int b = color[2];
+            int r = color[0] * 255.0f;
+            int g = color[1] * 255.0f;
+            int b = color[2] * 255.0f;
             if (name == "")
                 name = "Capsule " + std::to_string(scene->capsules.size() + 1);
 
-            scene->addCapsule(RMscene::capsule(vec3(ax, ay, az), vec3(bx, by, bz), radius, vec3(r, g, b), name));
+            scene->addCapsule(RMscene::capsule(vec3(ax, ay, az), vec3(bx, by, bz), radius, sf::Color(r, g, b), name));
             scene->sendToShader(shader);
 
             ImGui::CloseCurrentPopup();
             ax = 0; ay = 0; az = 0; bx = 0; by = 0; bz = 0; radius = 0; color[0] = 0; color[1] = 0; color[2] = 0; name = "";
-            return;
         }
         ImGui::SameLine();
         if (ImGui::Button("Cancel"))
         {
             ImGui::CloseCurrentPopup();
             ax = 0; ay = 0; az = 0; bx = 0; by = 0; bz = 0; radius = 0; color[0] = 0; color[1] = 0; color[2] = 0; name = "";
-            return;
         }
         ImGui::EndPopup();
     }
@@ -192,14 +199,27 @@ void RMUI::addCapsuleMenu()
 
 void RMUI::editCapsuleMenu(UINT index)
 {
-    static float ax = scene->capsules[index].a.x, ay = scene->capsules[index].a.y, az = scene->capsules[index].a.z,
-                 bx = scene->capsules[index].b.x, by = scene->capsules[index].b.y, bz = scene->capsules[index].b.z, 
-                 radius = scene->capsules[index].r;
-    static float color[3] = { scene->capsules[index].color.r / 255.0f,  scene->capsules[index].color.g / 255.0f, scene->capsules[index].color.b / 255.0f };
-    static std::string name = scene->capsules[index].name;
+
 
     if (ImGui::BeginPopupModal("Edit Capsule"))
     {
+        static float ax, ay, az, bx, by, bz, radius;
+        static float color[3];
+        static std::string name;
+        static bool isEditingCaps = false;
+
+        if (!isEditingCaps)
+        {
+            ax = scene->capsules[index].a.x, ay = scene->capsules[index].a.y, az = scene->capsules[index].a.z,
+                bx = scene->capsules[index].b.x, by = scene->capsules[index].b.y, bz = scene->capsules[index].b.z,
+                radius = scene->capsules[index].r;
+            color[0] = scene->capsules[index].color.r / 255.0f;
+            color[1] = scene->capsules[index].color.g / 255.0f;
+            color[2] = scene->capsules[index].color.b / 255.0f;
+            name = scene->capsules[index].name;
+            isEditingCaps = true;
+        }
+
         ImGui::Text("Point A");
         ImGui::PushItemWidth(50);
         ImGui::InputFloat("x##1", &ax); ImGui::SameLine();
@@ -230,16 +250,16 @@ void RMUI::editCapsuleMenu(UINT index)
             scene->changeCapsule(index, RMscene::capsule(vec3(ax, ay, az), vec3(bx, by, bz), radius, sf::Color(r, g, b), name));
             scene->sendToShader(shader);
 
-            ImGui::CloseCurrentPopup();
+            isEditingCaps = false;
             ax = 0; ay = 0; az = 0; bx = 0; by = 0; bz = 0; radius = 0; color[0] = 0; color[1] = 0; color[2] = 0; name = "";
-            return;
+            ImGui::CloseCurrentPopup();
         }
         ImGui::SameLine();
         if (ImGui::Button("Cancel"))
         {
-            ImGui::CloseCurrentPopup();
+            isEditingCaps = false;
             ax = 0; ay = 0; az = 0; bx = 0; by = 0; bz = 0; radius = 0; color[0] = 0; color[1] = 0; color[2] = 0; name = "";
-            return;
+            ImGui::CloseCurrentPopup();
         }
         ImGui::EndPopup();
     }

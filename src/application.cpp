@@ -14,7 +14,7 @@ int main()
     sf::Event event;
 
     sf::Vector2f windowSize = { (float)window.getSize().x, (float)window.getSize().y };
-    sf::Vector2f viewPort = sf::Vector2f(windowSize.x / 2, windowSize.y);
+    sf::Vector2f viewPort = sf::Vector2f(windowSize.x, windowSize.y);
 
     sf::Shader shader;
 
@@ -35,10 +35,8 @@ int main()
     //scene.addSphere({vec4(1, 1, 10, 1.5), sf::Color::White, "sphere 1"});
     //scene.addSphere({ vec4(-1, 1, 10, 1.5), sf::Color::Yellow, "sphere 2" });
     //scene.addCapsule({ vec3(-3, 2, 10), vec3(3, 2, 10), 1 , sf::Color::Red, "capsule 1"});
-    //scene.addPlane({ vec3(0,0,0), vec3(0,1,0) , sf::Color::White, "plane 1"});
+    //scene.addPlane({ vec3(0,0,0), vec3(0,1,0) , sf::Color(255,255,255), "plane 1"});
 
-    //scene.writeToFile("test", "C:/Users/phhni/Desktop");
-    //scene.readFromFile("C:/Users/phhni/Desktop/test.rmsop");
     scene.sendToShader(&shader);
 
     RMUI ui(&shader, &scene);

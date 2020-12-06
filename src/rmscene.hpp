@@ -23,34 +23,34 @@ public:
 	struct sphere
 	{
 		sphere(){}
-		sphere(vec4 _s, vec3 _color, std::string _name)
+		sphere(vec4 _s, sf::Color _color, std::string _name)
 			: s(_s), color(_color), name(_name) {}
 
 		vec4 s;
-		vec3 color;
+		sf::Color color;
 		std::string name;
 	};
 	
 	struct capsule
 	{
 		capsule(){}
-		capsule(vec3 _a, vec3 _b, float _r, vec3 _color, std::string _name)
+		capsule(vec3 _a, vec3 _b, float _r, sf::Color _color, std::string _name)
 			: a(_a), b(_b), r(_r), color(_color), name(_name) {}
 		vec3 a;
 		vec3 b;
 		float r;
-		vec3 color;
+		sf::Color color;
 		std::string name;
 	};
 
 	struct plane
 	{
 		plane(){}
-		plane(vec3 _p, vec3 _n, vec3 _color, std::string _name)
-			: p(_p), n(_n), color(color), name(_name) {}
+		plane(vec3 _p, vec3 _n, sf::Color _color, std::string _name)
+			: p(_p), n(_n), color(_color), name(_name) {}
 		vec3 p;
 		vec3 n;
-		vec3 color;
+		sf::Color color;
 		std::string name;
 	};
 //private:

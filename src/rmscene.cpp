@@ -1,6 +1,7 @@
 #include "rmscene.hpp"
 #include <fstream>
 #include <istream>
+#include <iostream>
 
 
 RMscene::RMscene()
@@ -19,7 +20,7 @@ void RMscene::sendToShader(sf::Shader* shader)
 		for (UINT i = 0; i < size; i++)
 		{
 			s[i] = spheres[i].s;
-			sc[i] = vec4(spheres[i].color.x, spheres[i].color.y, spheres[i].color.z, 1.0f);
+			sc[i] = vec4(spheres[i].color.r / 255.0f, spheres[i].color.g / 255.0f, spheres[i].color.b / 255.0f, 1.0f);
 		}
 
 
@@ -51,7 +52,7 @@ void RMscene::sendToShader(sf::Shader* shader)
 			cb[i] = capsules[i].b;
 			cr[i] = capsules[i].r;
 			// normalizing color value
-			cc[i] = vec4(capsules[i].color.x, capsules[i].color.y, capsules[i].color.z, 1.0f);
+			cc[i] = vec4(capsules[i].color.r / 255.0f, capsules[i].color.g / 255.0f, capsules[i].color.b / 255.0f, 1.0f);
 
 		}
 
@@ -87,9 +88,8 @@ void RMscene::sendToShader(sf::Shader* shader)
 		{
 			pp[i] = planes[i].p;
 			pn[i] = planes[i].n;
-			// normalizing color value
-			pc[i] = vec4(planes[i].color.x, planes[i].color.y, planes[i].color.z, 1.0f);
-
+			pc[i] = vec4((float)planes[i].color.g / 255.0f, (float)planes[i].color.g / 255.0f, (float)planes[i].color.b / 255.0f, 1.0f);
+			std::cout << (int)i << std::endl;
 		}
 		vec3* upp = pp.data();
 		vec3* upn = pn.data();
@@ -182,9 +182,9 @@ bool RMscene::writeToFile(std::string name, std::string path)
 			+ std::to_string(spheres[i].s.z) + " "
 			+ std::to_string(spheres[i].s.w) + "\n";
 
-		output += std::to_string(spheres[i].color.x) + " "
-			+ std::to_string(spheres[i].color.y) + " "
-			+ std::to_string(spheres[i].color.z) + "\n";
+		output += std::to_string(spheres[i].color.r) + " "
+			+ std::to_string(spheres[i].color.g) + " "
+			+ std::to_string(spheres[i].color.b) + "\n";
 	}
 	output += "capsules\n";
 	output += std::to_string(capsules.size()) + "\n";
@@ -202,9 +202,9 @@ bool RMscene::writeToFile(std::string name, std::string path)
 
 		output += std::to_string(capsules[i].r) + "\n";
 
-		output += std::to_string(capsules[i].color.x) + " "
-			+ std::to_string(capsules[i].color.y) + " "
-			+ std::to_string(capsules[i].color.z) + "\n";
+		output += std::to_string(capsules[i].color.r) + " "
+			+ std::to_string(capsules[i].color.g) + " "
+			+ std::to_string(capsules[i].color.b) + "\n";
 	}
 	output += "planes\n";
 	output += std::to_string(planes.size()) + "\n";
@@ -221,9 +221,9 @@ bool RMscene::writeToFile(std::string name, std::string path)
 			+ std::to_string(planes[i].n.y) + " "
 			+ std::to_string(planes[i].n.z) + "\n";
 
-		output += std::to_string(planes[i].color.x) + " "
-			+ std::to_string(planes[i].color.y) + " "
-			+ std::to_string(planes[i].color.z) + "\n";
+		output += std::to_string(planes[i].color.r) + " "
+			+ std::to_string(planes[i].color.g) + " "
+			+ std::to_string(planes[i].color.b) + "\n";
 	}
 	output += "END";
 
@@ -271,13 +271,13 @@ bool RMscene::readFromFile(std::string path)
 
 		std::getline(file, line);
 		ci = line.find(" ");
-		current.color.x = std::stof(line.substr(0, ci));
+		current.color.r = std::stoi(line.substr(0, ci));
 		li = ci + 1;
 		ci = line.find(" ", li);
-		current.color.y = std::stof(line.substr(li, ci));
+		current.color.g = std::stoi(line.substr(li, ci));
 		li = ci + 1;
 		ci = line.find(" ", li);
-		current.color.z = std::stof(line.substr(li, ci));
+		current.color.b = std::stoi(line.substr(li, ci));
 
 		New.spheres.push_back(current);
 	}
@@ -315,13 +315,13 @@ bool RMscene::readFromFile(std::string path)
 
 		std::getline(file, line);
 		ci = line.find(" ");
-		current.color.x = std::stof(line.substr(0, ci));
+		current.color.r = std::stoi(line.substr(0, ci));
 		li = ci + 1;
 		ci = line.find(" ", li);
-		current.color.y = std::stof(line.substr(li, ci));
+		current.color.g = std::stoi(line.substr(li, ci));
 		li = ci + 1;
 		ci = line.find(" ", li);
-		current.color.z = std::stof(line.substr(li, ci));
+		current.color.b = std::stoi(line.substr(li, ci));
 
 		New.capsules.push_back(current);
 	}
@@ -357,13 +357,13 @@ bool RMscene::readFromFile(std::string path)
 
 		std::getline(file, line);
 		ci = line.find(" ");
-		current.color.x = std::stof(line.substr(0, ci));
+		current.color.r = std::stoi(line.substr(0, ci));
 		li = ci + 1;
 		ci = line.find(" ", li);
-		current.color.y = std::stof(line.substr(li, ci));
+		current.color.g = std::stoi(line.substr(li, ci));
 		li = ci + 1;
 		ci = line.find(" ", li);
-		current.color.z = std::stof(line.substr(li, ci));
+		current.color.b = std::stoi(line.substr(li, ci));
 
 		New.planes.push_back(current);
 	}
