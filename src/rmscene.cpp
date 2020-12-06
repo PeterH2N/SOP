@@ -12,6 +12,9 @@ RMscene::RMscene()
 
 void RMscene::sendToShader(sf::Shader* shader)
 {
+    static vec4* temp4;
+    static vec3* temp3;
+    static float* temp;
 	int size;
 	// spheres
 	size = spheres.size();
@@ -35,9 +38,10 @@ void RMscene::sendToShader(sf::Shader* shader)
 	}
 	else
 	{
-		shader->setUniformArray("sphere", &vec4(), 0);
+
+        shader->setUniformArray("sphere", temp4, 0);
 		shader->setUniform("numSpheres", 0);
-		shader->setUniformArray("sphereCol", &vec4(), 0);
+        shader->setUniformArray("sphereCol", temp4, 0);
 	}
 
 	// capsules
@@ -71,12 +75,11 @@ void RMscene::sendToShader(sf::Shader* shader)
 	}
 	else
 	{
-		float* ucr;
-		shader->setUniformArray("capsuleA", &vec3(), 0);
-		shader->setUniformArray("capsuleB", &vec3(), 0);
-		shader->setUniformArray("capsuleR", ucr, 0);
+        shader->setUniformArray("capsuleA", temp3, 0);
+        shader->setUniformArray("capsuleB", temp3, 0);
+        shader->setUniformArray("capsuleR", temp, 0);
 		shader->setUniform("numCaps", 0);
-		shader->setUniformArray("capsuleCol", &vec4(), 0);
+        shader->setUniformArray("capsuleCol", temp4, 0);
 	}
 
 	//planes
@@ -103,10 +106,10 @@ void RMscene::sendToShader(sf::Shader* shader)
 	}
 	else
 	{
-		shader->setUniformArray("planeP", &vec3(), 0);
-		shader->setUniformArray("planeN", &vec3(), 0);
+        shader->setUniformArray("planeP", temp3, 0);
+        shader->setUniformArray("planeN", temp3, 0);
 		shader->setUniform("numPlanes", 0);
-		shader->setUniformArray("planeCol", &vec4(), 0);
+        shader->setUniformArray("planeCol", temp4, 0);
 	}
 
 	// cubes
@@ -137,11 +140,11 @@ void RMscene::sendToShader(sf::Shader* shader)
 	}
 	else
 	{
-		shader->setUniformArray("cubeP", &vec3(), 0);
-		shader->setUniformArray("cubeS", &vec3(), 0);
-		shader->setUniformArray("cubeRot", &vec3(), 0);
+        shader->setUniformArray("cubeP", temp3, 0);
+        shader->setUniformArray("cubeS", temp3, 0);
+        shader->setUniformArray("cubeRot", temp3, 0);
 		shader->setUniform("numCubes", 0);
-		shader->setUniformArray("cubeCol", &vec4(), 0);
+        shader->setUniformArray("cubeCol", temp4, 0);
 	}
 }
 

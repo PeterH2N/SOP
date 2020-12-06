@@ -505,6 +505,7 @@ void RMUI::objects()
             cubeList();
             ImGui::TreePop();
         }
+        ImGui::TreePop();
     }
 }
 
@@ -523,14 +524,12 @@ void RMUI::saveScene()
             scene->writeToFile(name, path);
             path = ""; name = "";
             ImGui::CloseCurrentPopup();
-            return;
         }
         ImGui::SameLine();
         if (ImGui::Button("Cancel"))
         {
             path = ""; name = "";
             ImGui::CloseCurrentPopup();
-            return;
         }
         ImGui::EndPopup();
     }
@@ -549,14 +548,12 @@ void RMUI::openScene()
             scene->sendToShader(shader);
             path = "";
             ImGui::CloseCurrentPopup();
-            return;
         }
         ImGui::SameLine();
         if (ImGui::Button("Cancel"))
         {
             path = "";
             ImGui::CloseCurrentPopup();
-            return;
         }
         ImGui::EndPopup();
     }
