@@ -6,9 +6,10 @@
 
 #include <SFML/Graphics.hpp>
 #include <SFML/System.hpp>
-#include <SFML/OpenGL.hpp>
 
 #include <string>
+
+#define M_PI 3.14159265359f
 
 typedef sf::Glsl::Vec4 vec4;
 typedef sf::Glsl::Vec3 vec3;

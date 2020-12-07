@@ -6,10 +6,12 @@
 class RMUI
 {
 public: 
-	RMUI(sf::Shader*, RMscene*);
+	RMUI(sf::Shader*, RMscene*, bool*);
 private:
 	bool shadow;
 	bool color;
+
+	bool* render;
 
 
 	sf::Shader* shader;

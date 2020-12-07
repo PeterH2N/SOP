@@ -4,8 +4,8 @@
 #include "tinyfiledialogs.h"
 
 
-RMUI::RMUI(sf::Shader* _shader, RMscene* _scene)
-    : shadow(true), color(true), shader(_shader), scene(_scene)
+RMUI::RMUI(sf::Shader* _shader, RMscene* _scene, bool* _render)
+    : shadow(true), color(true), shader(_shader), scene(_scene), render(_render)
 {
     shader->setUniform("shadow", shadow);
     shader->setUniform("color", color);
@@ -483,6 +483,7 @@ void RMUI::shaderOptions()
             shader->setUniform("shadow", shadow);
         if (ImGui::Checkbox("Colors", &color))
             shader->setUniform("color", color);
+        ImGui::Checkbox("Render", render);
 
         ImGui::TreePop();
     }
@@ -553,7 +554,7 @@ void RMUI::openScene()
 void RMUI::draw()
 {
 
-    if (!ImGui::Begin("Options"))
+    if (!ImGui::Begin("RayMarcher Options"))
     {
         // Early out if the window is collapsed, as an optimization.
         ImGui::End();

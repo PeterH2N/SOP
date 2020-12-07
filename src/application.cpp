@@ -2,6 +2,16 @@
 #include "rm.hpp"
 #include <iostream>
 
+#include "GL/glew.h"
+
+#define GLM_ENABLE_EXPERIMENTAL
+#include "glm/glm.hpp" 
+#include "glm/gtx/transform.hpp"
+
+
+#ifndef GL_SRGB8_ALPHA8
+#define GL_SRGB8_ALPHA8 0x8C43
+#endif
 
 int main()
 {
@@ -14,6 +24,8 @@ int main()
     std::string frag = "res/shader/raymarching_shader.frag";
 
     RayMarcher RM(vert, frag, &window);
+
+   
 
     sf::Event event;
     sf::Clock deltaClock;
@@ -35,9 +47,10 @@ int main()
         ImGui::SFML::Update(window, deltaClock.restart());
 
         window.clear();
-        RM.ui.draw();
+
         RM.draw();
         ImGui::SFML::Render(window);;
+
         window.display();
     }
 

@@ -115,10 +115,6 @@ distCol sceneSDFCol(vec3 p)
     // spheres
     for (int i = 0; i < numSpheres; i++)
     {
-        /*for (int j = 0; j < numOperations; j++)
-        {
-            if (objects[j].x == 1 && objects[j].y ==)
-        }*/
         float dist = sphereSDF(p, sphere[i]);
         if (min.dist > dist)
         {
@@ -260,7 +256,7 @@ float GetLight(vec3 p)
     if (shadow)
     {
         float d = RayMarch(p + n * SURF_DIST * 2, l);
-        if (d < length(lightPos - p)) dif *= .1;
+        if (d < length(lightPos - p)) dif *= .2;
     }
 
     return dif;

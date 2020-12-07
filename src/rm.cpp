@@ -2,7 +2,7 @@
 #include <iostream>
 
 RayMarcher::RayMarcher(std::string vert, std::string frag, sf::RenderWindow* _window)
-	: scene(), ui(RMUI(&shader, &scene)), window(_window)
+	: scene(), render(true), ui(RMUI(&shader, &scene, &render)), window(_window)
 {
 	shader.loadFromFile(vert, frag);
 
@@ -14,7 +14,7 @@ RayMarcher::RayMarcher(std::string vert, std::string frag, sf::RenderWindow* _wi
 
 	scene.sendToShader(&shader);
 
-	screen.setSize({ (float)window->getSize().x, (float)window->getSize().y });
+	screen.setSize({ (float)window->getSize().x, (float)window->getSize().y});
 	screen.setPosition(0, 0);
 
 	shader.setUniform("screenSize", screen.getSize());
@@ -32,14 +32,19 @@ RayMarcher::RayMarcher(std::string vert, std::string frag, sf::RenderWindow* _wi
 
 void RayMarcher::draw()
 {
-	// FPS
-	int fps = 1.0f / (float)deltaClock.restart().asSeconds();
-	FPSText.setString(std::to_string(fps));
-	// FPS
 
-	std::cout << fps << std::endl;
+		// FPS
+		int fps = 1.0f / (float)deltaClock.restart().asSeconds();
+		FPSText.setString(std::to_string(fps));
+		// FPS
 
-	shader.setUniform("time", (float)time.getElapsedTime().asSeconds());
-	window->draw(screen, &shader);
-	window->draw(FPSText);
+		if (render)
+		{
+			shader.setUniform("time", (float)time.getElapsedTime().asSeconds());
+			window->draw(screen, &shader);
+		}
+
+		ui.draw();
+		window->draw(FPSText);
+
 }

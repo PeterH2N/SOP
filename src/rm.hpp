@@ -27,6 +27,8 @@ public:
 
 	sf::RenderWindow* window;
 
+	bool render;
+
 public:
 
 	void draw();
