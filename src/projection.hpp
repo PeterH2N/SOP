@@ -53,6 +53,15 @@ inline int mainLoopProj()
 	ProjScene scene(&window, &mainShader);
 
 	scene.addMeshOBJ("res/scenes/testscene.obj", sf::Color::White);
+	scene.addMeshOBJ("res/scenes/teapot.obj", sf::Color::Cyan);
+	scene.addMeshOBJ("res/scenes/spaceship.obj", sf::Color(100, 100, 100));
+	scene.addMeshOBJ("res/scenes/cansatobj.obj", sf::Color::Yellow);
+
+	scene.moveMesh(1, { 3, 1, 10 });
+	scene.moveMesh(2, { -10, 6, 12 });
+	scene.moveMesh(3, { -3, 1, 5 });
+	scene.scaleMesh(3, 0.05);
+	
 
 	window.setActive(false);
 
@@ -136,7 +145,11 @@ inline int mainLoopProj()
 		if (camIsActive)
 			scene.cam.doMovement();
 
-		mainShader.setUniform("time", clock.getElapsedTime().asSeconds());
+		float time = clock.getElapsedTime().asSeconds();
+
+		mainShader.setUniform("time", time);
+
+		scene.rotateMesh(2, {deltaClock.getElapsedTime().asSeconds() * 20, 0, deltaClock.getElapsedTime().asSeconds() * 20 });
 
 		// Make the window the active window for OpenGL calls
 		window.setActive(true);
