@@ -10,7 +10,6 @@ RayMarcher::RayMarcher(std::string vert, std::string frag, sf::RenderWindow* _wi
 	shader.setUniform("color", true);
 
 	scene.addPlane({ vec3(0,0,0), vec3(0,1,0) , sf::Color(255,255,255), "Ground Plane" });
-	std::cout << scene.planes.size();
 
 	scene.sendToShader(&shader);
 
