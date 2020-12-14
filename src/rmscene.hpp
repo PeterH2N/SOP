@@ -21,7 +21,7 @@ class RMscene
 {
 public:
 	RMscene();
-
+	// struct for hver type af geomtri
 	struct sphere
 	{
 		sphere(){}
@@ -68,6 +68,7 @@ public:
 		std::string name;
 	};
 //private:
+	//vektor til hver af disse. Jeg ville have brugt nedarvning hvis det ikke var for GLSLs begrænsninger
 
 	std::vector<sphere> spheres;
 	std::vector<capsule> capsules;
@@ -77,6 +78,7 @@ public:
 public:
 	void sendToShader(sf::Shader*);
 
+	// en masse funktioner der ændrer på objekterne
 	void addSphere(RMscene::sphere);
 	void addCapsule(RMscene::capsule);
 	void addPlane(RMscene::plane);
@@ -92,6 +94,7 @@ public:
 	void removePlane(UINT);
 	void removeCube(UINT);
 
+	// til at oprette filer og indlæse dem igen
 	bool writeToFile(std::string);
 	bool readFromFile(std::string);
 };

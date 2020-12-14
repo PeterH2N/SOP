@@ -13,6 +13,7 @@ varying vec3 col;
 
 void main() 
 {
+	// afbilder 3d punkter på skærmen
 	gl_Position = proj * view * model * vec4(position, 1.0);
 	fragPos = vec3(model * vec4(position, 1.0f));
 	norm = mat3(transpose(inverse(model))) * normal;

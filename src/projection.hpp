@@ -7,27 +7,28 @@
 
 inline int mainLoopProj()
 {
-	///Basic vertex shader that transforms the vertex position based on a projection view matrix and passes the texture coordinate to the fragment shader.
+	// vertex shader som afbilder verteces og normalvektorer, og sender farven videre til fragment shaderen.
 	const std::string defaultVertexShader = "res/shader/3dproj_shader.vert";
 
-	///Basic fragment shader that returns the colour of a pixel based on the input texture and its coordinate.
+	// fragment shader som beregner lysniveau ud fra normalvektoren, og en lyskilde, og sætter farven efter dette
 	const std::string defaultFragShader = "res/shader/3dproj_shader.frag";
 
-	// Request a 24-bits depth buffer when creating the window
+	// indstillinger til vinduet
 	sf::ContextSettings contextSettings;
 	contextSettings.depthBits = 24;
 	contextSettings.sRgbCapable = false;
 
-	// Create the main window
+	// Vinduet, lavet gennem SFML
 	sf::RenderWindow window(sf::VideoMode(1280, 720), "Peters SOP projekt - projektion", sf::Style::Default, contextSettings);
+	// vi undlader at låse framerate, da meningen er at sammenligne 
 	//window.setVerticalSyncEnabled(true);
 
-	// Initialise GLEW for the extended functions.
+	// Initialiser wrapper APIen GLEW
 	glewExperimental = GL_TRUE;
 	if (glewInit() != GLEW_OK)
 		return EXIT_FAILURE;
 
-	// Create some text to draw on top of our OpenGL object
+	// Laver noget tekst som forklarer kameraet
 	sf::Font font;
 	if (!font.loadFromFile("res/fonts/arial.ttf"))
 		return EXIT_FAILURE;
@@ -37,26 +38,30 @@ inline int mainLoopProj()
 	text.setFillColor(sf::Color(255, 255, 255, 170));
 	text.setPosition(window.getSize().x / 2, window.getSize().y - 50);
 
-	// Make the window the active window for OpenGL calls
+	// Sætter vinduet som det aktive vindue til openGL
 	window.setActive(true);
 
-	// Enable Z-buffer read and write and culling.
+	// Sørger for at tegne det forreste foran det bagerste. Det sørger openGL for nu
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
 
+	// laver en sf::Shader instans, nemmere end selv at loade shaders
 	sf::Shader mainShader;
 
-
+	// får sfml til at tage shaders fra filen
 	mainShader.loadFromFile(defaultVertexShader, defaultFragShader);
 
+	// laver en scene og giver den vinduet og shaderen
 	ProjScene scene(&window, &mainShader);
 
+	// tilføjer en masse testobjekter til scenen
 	scene.addMeshOBJ("res/scenes/testscene.obj", sf::Color::White);
 	scene.addMeshOBJ("res/scenes/teapot.obj", sf::Color::Cyan);
 	scene.addMeshOBJ("res/scenes/spaceship.obj", sf::Color(100, 100, 100));
 	scene.addMeshOBJ("res/scenes/cansatobj.obj", sf::Color::Yellow);
 
+	// ryjje objekterne lidt rundt så de er præsenteret pænt
 	scene.moveMesh(1, { 3, 1, 10 });
 	scene.moveMesh(2, { -10, 6, 12 });
 	scene.moveMesh(3, { -3, 1, 5 });
@@ -65,16 +70,15 @@ inline int mainLoopProj()
 
 	window.setActive(false);
 
-	// Make the window no longer the active window for OpenGL calls
 
-
-	// Create a clock for measuring the time elapsed
+	// Laver en timer til total tid, og en til tid mellem hver iteration
 	sf::Clock clock;
 	sf::Clock deltaClock;
 
-	// is the camera active
+	// Er kameraet aktivt
 	bool camIsActive = false;
 
+	// tekst til at vise FPS i øverste venstre hjørne
 	sf::Text FPSText;
 	if (!font.loadFromFile("res/fonts/arial.ttf"))
 		std::cout << "Font did not load!";
@@ -85,28 +89,31 @@ inline int mainLoopProj()
 	FPSText.setPosition({ 10,10 });
 	FPSText.setStyle(sf::Text::Bold);
 
+	// returværdi, som bestemmer om programmet skal fortsætte eller ej
 	int EXITCODE = 0;
 
-	// Start game loop
+	// Start loop
 	while (window.isOpen())
 	{
-		// Process events
+		
 		sf::Event event;
 		while (window.pollEvent(event))
 		{
-			// Close window: exit
+			// Hvis vinduet lukkes skal hele programmet termineres
 			if (event.type == sf::Event::Closed)
 			{
 				EXITCODE = 1;
 				window.close();
 			}
 
+			// hvis escape trykkes skal der skiftes til andet vindue
 			if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape)
 			{
 				EXITCODE = 0;
 				window.close();
 			}
 
+			// at trykke C gør kameraet aktivt og låser musen. tryk C igen for at slippe ud
 			if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::C)
 			{
 				if (!camIsActive)
@@ -126,52 +133,51 @@ inline int mainLoopProj()
 
 			}
 
-			// Adjust the viewport when the window is resized
+			// Juster opengl viewport når vinduet ændrer størrelse
 			if (event.type == sf::Event::Resized)
 			{
-				// Make the window the active window for OpenGL calls
 				window.setActive(true);
 
 				glViewport(0, 0, event.size.width, event.size.height);
 
-				// Make the window no longer the active window for OpenGL calls
 				window.setActive(false);
 			}
 		}
 
-		// Clear the depth buffer
+		// clear opengl
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		if (camIsActive)
 			scene.cam.doMovement();
 
+
+		// sender tiden til fragment shaderen
 		float time = clock.getElapsedTime().asSeconds();
 
 		mainShader.setUniform("time", time);
 
+		// roterer det ene objekt
 		scene.rotateMesh(2, {deltaClock.getElapsedTime().asSeconds() * 20, 0, deltaClock.getElapsedTime().asSeconds() * 20 });
 
-		// Make the window the active window for OpenGL calls
+
+
 		window.setActive(true);
-
-
-		///////////////////////////////
+		// tegn al opengl her//////////
 		scene.draw();
 		///////////////////////////////
-		// Make the window no longer the active window for OpenGL calls
 		window.setActive(false);
 
-		// Draw some text on top of our OpenGL object
+		// kald pushGLStates for at tegne normal sfml igen
 		window.pushGLStates();
-		// FPS
+		// FPS //////////////
 		int fps = 1.0f / (float)deltaClock.restart().asSeconds();
 		FPSText.setString(std::to_string(fps));
-		// FPS
 		window.draw(text);
 		window.draw(FPSText);
+		// FPS //////////////
 		window.popGLStates();
 
-		// Finally, display the rendered frame on screen
+		// Vis alt det tegnede på skærmen
 		window.display();
 	}
 

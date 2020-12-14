@@ -3,6 +3,7 @@
 
 #include "ui.hpp"
 
+// wrapper klasse til det hele, for at gøre loopet mere clean
 class RayMarcher
 {
 public:
@@ -27,6 +28,7 @@ public:
 
 	sf::RenderWindow* window;
 
+	// boolean der fortæller om vi overhovedet skal rendere til skærmen
 	bool render;
 
 public:

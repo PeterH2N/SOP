@@ -81,10 +81,12 @@ void Mesh::loadFromOBJ(const std::string& path)
 
 	while (std::getline(file, line))
 	{
+		// kommetarer
 		if (line[0] == '#')
 		{
 
 		}
+		// verteces
 		else if (line[0] == 'v' && line[1] == ' ')
 		{
 			int i1, i2;
@@ -102,17 +104,19 @@ void Mesh::loadFromOBJ(const std::string& path)
 			{
 				verts.push_back(0);
 			}
-			//std::cout << verts.size() << std::endl;
 
 		}
+		// tjekker om der er information om normalvektorer. Disse bruges ikke, da vi selv udregner dem.
 		else if (!normals && line[0] == 'v' && line[1] == 'n')
 		{
 			normals = true;
 		}
+		// tjekker om der er textureinformation.
 		else if (!textures && line[0] == 'v' && line[1] == 't')
 		{
 			textures = true;
 		}
+		// hvis hverken normalvektor eller texture information er der, skal indekserne læses lidt anderledes
 		else if (line[0] == 'f' && !normals && !textures)
 		{
 			int i1, i2;
@@ -124,7 +128,8 @@ void Mesh::loadFromOBJ(const std::string& path)
 				i1 = i2;
 			}
 		}
-		else if (line[0] == 'f' && normals)
+		// når der er info om enten normal eller textures står index lidt anderleses i filen.
+		else if ((line[0] == 'f' && normals) || (line[0] == 'f' && textures))
 		{
 			int space = 0;
 			int slash = 0;
@@ -140,12 +145,14 @@ void Mesh::loadFromOBJ(const std::string& path)
 
 void Mesh::draw()
 {
+	// sætter model matricen i shaderen
 	shader->setUniform("model", model());
+	// binder vores vertex array objekt
 	glBindVertexArray(vao);
-
+	// tegner alle trekanterne
 	glDrawElements(GL_TRIANGLES, drawCount(), GL_UNSIGNED_INT, 0);
 
-	// Reset the vertex array bound
+	// binder vertexarrayobjekt til intet, så der kan tegnes andet.
 	glBindVertexArray(0);
 }
 
@@ -168,7 +175,7 @@ void Mesh::scale(float s)
 
 void Mesh::init()
 {
-	// getting all triangles neatly packaged
+	// Pakke alle trekanter ind så de er nemmere at tilg¨å
 	std::vector<glm::vec<3, glm::fvec3>> tris;
 
 	for (UINT i = 0; i < indices.size(); i += 3)
@@ -182,7 +189,7 @@ void Mesh::init()
 		tris.push_back(tri);
 	}
 
-	// putting them all into the vertex vector, with normals and color
+	// Sætter dem alle ind i en ny vektor
 	for (UINT i = 0; i < tris.size(); i++)
 	{
 		glm::fvec3 normal = calculateFaceNormal(tris[i]);
@@ -238,7 +245,8 @@ void Mesh::init()
 	{
 		flatIndices.push_back(i);
 	}
-	//std::cout << flatIndices.size() << std::endl;
+
+	// sætter vertex array objects og vertex buffer objects op, og sender geometridata til grafikhukommelsen
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
 
@@ -264,6 +272,5 @@ void Mesh::init()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexVBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, drawCount() * sizeof(indices[0]), flatIndices.data(), GL_STATIC_DRAW);
 
-	//Make sure to bind the vertex array to null if you wish to define more objects.
 	glBindVertexArray(0);
 }

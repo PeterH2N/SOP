@@ -8,6 +8,7 @@ RMscene::RMscene()
 {
 }
 
+// sender objekter til shader med uniforms. Der skal en masse conversion til
 void RMscene::sendToShader(sf::Shader* shader)
 {
     static vec4* temp4;
@@ -197,6 +198,7 @@ void RMscene::removePlane(UINT i)
 		planes.erase(planes.begin() + i);
 }
 
+// skriver til mit eget lille ascii filformat. 
 bool RMscene::writeToFile(std::string path)
 {
 	std::ofstream file;
@@ -290,6 +292,7 @@ bool RMscene::writeToFile(std::string path)
 	return true;
 }
 
+// læser ind fra mit ascii filformat
 bool RMscene::readFromFile(std::string path)
 {
 	RMscene New;

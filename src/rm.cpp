@@ -29,6 +29,7 @@ RayMarcher::RayMarcher(std::string vert, std::string frag, sf::RenderWindow* _wi
 	FPSText.setStyle(sf::Text::Bold);
 }
 
+// tegner både scene og UI
 void RayMarcher::draw()
 {
 

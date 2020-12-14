@@ -29,8 +29,9 @@ public:
 	Mesh(sf::Shader* _shader, sf::Color _color);
 	~Mesh();
 
-//private:
+private:
 
+	// vertex buffer objekter
 	GLuint vertexVBO;
 	GLuint indexVBO;
 
@@ -40,44 +41,56 @@ public:
 	std::vector<glm::fvec3> faceNormals;
 	std::vector<GLfloat> flatVerts;
 	std::vector<int> flatIndices;
-private:
+
+	// pointer til den shader der bruges
 	sf::Shader* shader;
 
+	// farve på meshen
 	sf::Color color;
 
-	// Stride is the number of bytes per array element.
+	// Stride er antal bytes per element.
 	const uint64_t stride = sizeof(GLfloat) * 9;
-	// data offset for the normal information
+	// fortæller hvor mange bytes der skal skippes for at få information om normalvektorer.
 	const uint64_t normalOffset = sizeof(GLfloat) * 3;
-	// data offset for color information
+	// samme, men for farveinfo
 	const uint64_t colorOffset = sizeof(GLfloat) * 6;
-	// Amount of index elements in total.
+	// antal verteces
 	unsigned int drawCount();
 
+	// vertex array objekt
 	GLuint vao;
 
+	// udrenger normalvektorer for hver overflade/trekant og gemmer den i facenormals. Indexet i faceNormals passer med indeces
 	glm::fvec3 calculateFaceNormal(glm::vec<3, glm::fvec3>);
 
+	// postition i rum, så objektet kan flyttes
 	glm::fvec3 position;
 
-	// rotation in degrees
+	// rotation i grader (omregnes til radianer senere)
 	float rotX, rotY, rotZ;
 	float scalar;
 
+	// returnerer tranlaterings og rotations matrix for objektet, som bruges når objektet tegnes på skærmen
 	sf::Glsl::Mat4 model();
 
 public:
 
+	// sætter data ind i vertexayyaybuffer og index vertexarraybufferen. Må IKKE kaldes mere end 1 gang.
 	void init();
 
+	// vertex og index data indlæses fra en obj fil.
 	void loadFromOBJ(const std::string& path);
 
+	// tegner objektet. Kaldes i loop, eller bare i forbindelse med scene draw funktionen
 	void draw();
 
+	// translaterer objektet
 	void move(glm::fvec3);
 
+	// roterer ved at tilføje rotation
 	void rotate(glm::fvec3);
 
+	// skalerer objektet
 	void scale(float);
 
 };

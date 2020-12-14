@@ -11,6 +11,7 @@ uniform float time;
 uniform bool shadow;
 uniform bool color;
 
+// så vidt jeg ved kan man ikke lave dynamiske uniform arrays. Derfor har jeg sat en arbitrær grænse på 50 for hver uniform.
 // getting spheres from main program //
 uniform int numSpheres;
 uniform vec4 sphere[50];
@@ -46,12 +47,14 @@ uniform float operation[50];
 uniform int numOperations;
 // ------------------------------------ //
 
+// lille struct der sørger for at jeg kan returnere objektets farve sammen med distancen
 struct distCol
 {
     float dist;
     vec3 col;
 };
 
+// roteringsmatrix til kasserne. Fungerer i princippet på alle objekter, men det er ikke implementeret.
 mat2 Rot(float a)
 {
     float s = sin(a);
@@ -59,6 +62,7 @@ mat2 Rot(float a)
     return mat2(c, -s, s, c);
 }
 
+// funktioner til at kombinere objekter som aldrig blev implementeret
 float bSubtract(float a, float b)
 {
     return max(-a, b);
@@ -75,7 +79,7 @@ float sMin(float a, float b, float k)
     return mix(b, a, h) - k * h * (1.0 - h);
 }
 
-
+// signed distance funktions for alle objekterne
 float capsuleSDF(vec3 p, vec3 a, vec3 b, float r)
 {
     vec3 ab = b - a;
@@ -109,6 +113,7 @@ float cubeSDF(vec3 p, vec3 s)
     return iD + oD;
 }
 
+// denne funktion finder distancen til scenen, ved at finde den mindste af distancerne til alle objekterne
 distCol sceneSDFCol(vec3 p)
 {
     distCol min = distCol(MAX_DIST, vec3(0));
@@ -161,6 +166,7 @@ distCol sceneSDFCol(vec3 p)
     return min;
 }
 
+// denne funktion gør det samme, men uden farve, hvilket burde gøre den lidt hurtigere, da den ikke flytter på lige så eget data.
 float sceneSDF(vec3 p)
 {
     float minD = MAX_DIST;
@@ -196,6 +202,7 @@ float sceneSDF(vec3 p)
     return minD;
 }
 
+// raymarching funktion med farver
 distCol RayMarchCol(vec3 ro, vec3 rd)
 {
     float dO = 0.;
@@ -215,6 +222,7 @@ distCol RayMarchCol(vec3 ro, vec3 rd)
     return distCol(dO, col);
 }
 
+// raymarching funktion uden farver
 float RayMarch(vec3 ro, vec3 rd)
 {
     float dO = 0.;
@@ -229,6 +237,7 @@ float RayMarch(vec3 ro, vec3 rd)
     return dO;
 }
 
+// normalvektor til et punkt.
 vec3 GetNormal(vec3 p)
 {
     float d = sceneSDF(p);
@@ -243,6 +252,7 @@ vec3 GetNormal(vec3 p)
 
 }
 
+// diff lyset.
 float GetLight(vec3 p)
 {
     vec3 lightPos = vec3(0, 10, 6);
@@ -253,6 +263,7 @@ float GetLight(vec3 p)
 
     float dif = clamp(dot(n, l), 0., 1.);
 
+    // laver skygger hvis det er slået til
     if (shadow)
     {
         float d = RayMarch(p + n * SURF_DIST * 2, l);
@@ -264,12 +275,15 @@ float GetLight(vec3 p)
 
 void main()
 {
+// normaliserer koordinater
     vec2 uv = (gl_FragCoord.xy - .5 * screenSize) / min(screenSize.x, screenSize.y);
     vec3 col = vec3(1);
 
+    // kameraet og retningsvektor
     vec3 ro = vec3(0, 2, 0);
     vec3 rd = normalize(vec3(uv.x, uv.y, 1)); 
 
+    // kører forskelligt afhængig af om farve er slået til eller ej
     if (color)
     {
         distCol dc = RayMarchCol(ro, rd);

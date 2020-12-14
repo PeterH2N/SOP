@@ -13,10 +13,11 @@ private:
 
 	bool* render;
 
-
+	// pointers til den shader og den scene som UIen manipulerer
 	sf::Shader* shader;
 	RMscene* scene;
 
+	// menuer til alle de forskellige objekter. Kunne nok generaliseres med templates
 	void addSphereMenu();
 	void editSphereMenu(UINT);
 	void sphereList();

@@ -57,23 +57,26 @@ int ProjScene::numMeshes()
 
 void ProjScene::draw()
 {
-	// make a view matrix from the camera
+	// Få viewMatrix fra kameraet
 	glm::mat4 view = cam.getView();
 
-	// make a projection matrix
+	// Lav projektionsmatrix med glm
 	GLfloat ratio = static_cast<float>(window->getSize().x) / window->getSize().y;
 	glm::mat4 projection = glm::perspective(45.0f, ratio, 0.1f, 500.0f);
 
-	//Set the uniforms for the shader to use.
+	// Laver sf matricer, så de nemmere kan sendes til shaderen
 	sf::Glsl::Mat4 v(&view[0][0]);
 	sf::Glsl::Mat4 proj(&projection[0][0]);
 
+	// sender til shaderen
 	shader->setUniform("view", v);
 	shader->setUniform("proj", proj);
 
+	// binder shader
 	sf::Shader::bind(shader);
+	// tegner alle meshes
 	for (Mesh* mesh : meshes)
 		mesh->draw();
-
+	// unbinder shader
 	sf::Shader::bind(NULL);
 }

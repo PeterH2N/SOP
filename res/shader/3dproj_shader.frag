@@ -14,6 +14,7 @@ float ambientLight = 0.2;
 
 float getDiff(vec3 n)
 {
+	//dynamisk lys, men hardoded
 	lightPos.xz += vec2(sin(time), cos(time)) * 2;
 	vec3 lightDir = normalize(lightPos - fragPos);
 	return clamp(dot(n, lightDir), ambientLight, 1.0f);

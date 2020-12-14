@@ -1,7 +1,7 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
-// camera class is implemented based on this tutorial: https://www.youtube.com/watch?v=ns9eVfHCYdg
+// camera klsee er implementeret på baggrund af denne video: https://www.youtube.com/watch?v=ns9eVfHCYdg
 
 #include "mesh.hpp"
 
@@ -37,25 +37,37 @@ private:
 	float sensitivity;
 	float zoom;
 
+	// positionen af kameraet i world-space
 	glm::fvec3 position;
+	// vektor der betegner hvad op er i verden, uafhængig af hvordan kameraet er roteret.
 	glm::fvec3 worldUp;
+	// vektor der altid er parallel med xz planet, men peger samme retning som front.
 	glm::fvec3 worldFront;
+	// op i forhold til kameraets rotation
 	glm::fvec3 up;
+	// vektor der peger på det der kigges på
 	glm::fvec3 front;
+	// krydsprodukt af up og front.
 	glm::fvec3 right;
 
 	sf::Clock deltaClock;
 
+	// funktion der opdaterer alle vektorer på baggrund af ændringer i andre værdier
 	void updateVectors();
 
+	// tager en bevægelse (forlæns højre osv) ind, og ændrer på positionen.
 	void processKeyboard(camMovement, float deltaTime);
 
+	// tager en ændring i x og y ind, og ændrer på yaw og pitch
 	void processMouse(float xOffset, float yOffset, bool constrainPitch = true);
 
+	// zoom, bruges ikke.
 	void processScroll(float yOffset);
 public:
+	// giver view matricen, der skal bruges til at afbilde punkter
 	glm::mat4 getView();
 
+	// opsamling af al bevægelse, skal kaldes i loop.
 	void doMovement();
 
 };

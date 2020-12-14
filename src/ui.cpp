@@ -106,7 +106,6 @@ void RMUI::editSphereMenu(UINT index)
             scene->changeSphere(index, RMscene::sphere(vec4(x, y, z, radius), sf::Color(r, g, b), name));
             scene->sendToShader(shader);
             
-            //x = 0; y = 0; z = 0; radius = 0, color[0] = 0; color[1] = 0; color[2] = 0;
             name = "";
             isEditing = false;
             ImGui::CloseCurrentPopup();
@@ -114,7 +113,6 @@ void RMUI::editSphereMenu(UINT index)
         ImGui::SameLine();
         if (ImGui::Button("Cancel"))
         {
-            //x = 0; y = 0; z = 0; radius = 0, color[0] = 0; color[1] = 0; color[2] = 0;
             name = "";
             isEditing = false;
             ImGui::CloseCurrentPopup();
